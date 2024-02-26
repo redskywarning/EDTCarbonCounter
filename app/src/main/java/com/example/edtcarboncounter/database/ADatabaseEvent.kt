@@ -1,4 +1,6 @@
-package com.example.carbon_counter.database
+package com.example.edtcarboncounter.database
+
+import com.example.carbon_counter.database.ASortType
 
 //Contains different events that can happen => this relates to the SQL functions in the Dao files.
 sealed interface ADatabaseEvent {

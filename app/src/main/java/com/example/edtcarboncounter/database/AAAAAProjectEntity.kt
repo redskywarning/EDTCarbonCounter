@@ -1,4 +1,4 @@
-package com.example.carbon_counter.database
+package com.example.edtcarboncounter.database
 
 //Setting out all entities -- these are our tables that hold our data
 import androidx.room.Embedded

@@ -1,7 +1,9 @@
-package com.example.carbon_counter.database
+package com.example.edtcarboncounter.database
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.carbon_counter.database.ASortType
+import com.example.carbon_counter.oldDatabase.ZZSortType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -26,7 +28,7 @@ class ADatabaseViewModel(
             // thus if sort type changes materials change
             when(sortType) {
                 ASortType.MATERIAL_NAME -> dao.getMaterialsOrderedByMaterialName()
-                ASortType.CARBON_CONTENT -> dao.getMaterialsOrderedByCarbonContent()
+                ZZSortType.CARBON_CONTENT -> dao.getMaterialsOrderedByCarbonContent()
                 ASortType.PROJECT_NAME -> dao.getProjectsOrderedByProjectName()
             }
         }

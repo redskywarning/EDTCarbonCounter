@@ -1,4 +1,4 @@
-package com.example.carbon_counter.screens
+package com.example.edtcarboncounter.screens
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -21,11 +21,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.navigation.NavHostController
-import com.example.carbon_counter.NavRoutes
+import com.example.edtcarboncounter.NavRoutes
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
+import com.example.carbon_counter.screens.BottomBar
+import com.example.carbon_counter.screens.topBar
 import org.jetbrains.annotations.ApiStatus
 import java.util.Collections.emptyList
 

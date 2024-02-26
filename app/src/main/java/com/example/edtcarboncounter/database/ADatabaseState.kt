@@ -1,4 +1,7 @@
-package com.example.carbon_counter.database
+package com.example.edtcarboncounter.database
+
+import com.example.carbon_counter.database.ASortType
+import java.util.Collections.emptyList
 
 //Tells us state of what is currently on screen.
 data class ADatabaseState (
