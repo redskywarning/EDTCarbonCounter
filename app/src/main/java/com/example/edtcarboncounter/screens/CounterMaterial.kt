@@ -26,9 +26,9 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import com.example.carbon_counter.screens.BottomBar
-import com.example.carbon_counter.screens.topBar
-import org.jetbrains.annotations.ApiStatus
+//import com.example.carbon_counter.screens.BottomBar
+//import com.example.carbon_counter.screens.topBar
+//import org.jetbrains.annotations.ApiStatus
 import java.util.Collections.emptyList
 
 

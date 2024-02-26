@@ -7,8 +7,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
-import com.example.carbon_counter.screens.BottomBar
-import com.example.carbon_counter.screens.topBar
+//import com.example.carbon_counter.screens.BottomBar
+//import com.example.carbon_counter.screens.topBar
 import com.example.edtcarboncounter.NavRoutes
 
 @Composable

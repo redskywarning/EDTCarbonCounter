@@ -3,8 +3,8 @@ package com.example.edtcarboncounter.screens
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
-import com.example.carbon_counter.screens.BottomBar
-import com.example.carbon_counter.screens.topBar
+//import com.example.carbon_counter.screens.BottomBar
+//import com.example.carbon_counter.screens.topBar
 
 @Composable
 fun DatabaseAdd(navController: NavHostController) {
