@@ -4,6 +4,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 
+
 @Composable
 fun ReceiptRecall(navController: NavHostController) {
     Scaffold(topBar = {topBar(navController =navController) },
