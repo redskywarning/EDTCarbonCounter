@@ -1,4 +1,4 @@
-package com.example.carbon_counter.database
+package com.example.edtcarboncounter.database
 
 //Contains different events that can happen => this relates to the SQL functions in the Dao files.
 sealed interface ADatabaseEvent {
@@ -14,9 +14,8 @@ sealed interface ADatabaseEvent {
     ////////////////////////////////////////////////////////////////////////////////////
     object SaveProject: ADatabaseEvent
     data class SetProjectName(val projectName: String): ADatabaseEvent
-    data class SetMaterialUsed(val materialUsed: String): ADatabaseEvent
-    data class SetKgMaterialUsed(val kgMaterialUsed: Long): ADatabaseEvent
     data class SortProjects(val sortType: ASortType): ADatabaseEvent
     data class DeleteProjects(val project: ProjectEntity): ADatabaseEvent
-    /////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////
+    data class SetKgMaterialUsed(val kgMaterialUsed: Long): ADatabaseEvent
 }

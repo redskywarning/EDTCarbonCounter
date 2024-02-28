@@ -1,4 +1,4 @@
-package com.example.carbon_counter.database
+package com.example.edtcarboncounter.database
 
 //Tells us state of what is currently on screen.
 data class ADatabaseState (

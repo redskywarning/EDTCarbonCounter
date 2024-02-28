@@ -1,4 +1,4 @@
-package com.example.carbon_counter.database
+package com.example.edtcarboncounter.database
 
 import android.content.Context
 import androidx.room.Database

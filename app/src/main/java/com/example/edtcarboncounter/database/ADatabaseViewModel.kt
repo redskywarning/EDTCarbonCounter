@@ -2,6 +2,10 @@ package com.example.carbon_counter.database
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.edtcarboncounter.database.AAAllDao
+import com.example.edtcarboncounter.database.ADatabaseEvent
+import com.example.edtcarboncounter.database.ADatabaseState
+import com.example.edtcarboncounter.database.ASortType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -13,7 +17,7 @@ import kotlinx.coroutines.launch
 //Map all of states
 @OptIn(ExperimentalCoroutinesApi::class)
 class ADatabaseViewModel(
-    private val dao: AACarbonDao
+    private val dao: AAAllDao
 ) : ViewModel(){
 
     private val _sortType1 = MutableStateFlow(ASortType.MATERIAL_NAME)
@@ -26,7 +30,6 @@ class ADatabaseViewModel(
             // thus if sort type changes materials change
             when(sortType) {
                 ASortType.MATERIAL_NAME -> dao.getMaterialsOrderedByMaterialName()
-                ASortType.CARBON_CONTENT -> dao.getMaterialsOrderedByCarbonContent()
                 ASortType.PROJECT_NAME -> dao.getProjectsOrderedByProjectName()
             }
         }
@@ -77,6 +80,11 @@ class ADatabaseViewModel(
                 _sortType1.value = event.sortType
             }
             //is ADatabaseEvent.SortProjects -> TODO()
+            is ADatabaseEvent.DeleteProjects -> TODO()
+            ADatabaseEvent.SaveProject -> TODO()
+            is ADatabaseEvent.SetKgMaterialUsed -> TODO()
+            is ADatabaseEvent.SetProjectName -> TODO()
+            is ADatabaseEvent.SortProjects -> TODO()
         }
 
     }
