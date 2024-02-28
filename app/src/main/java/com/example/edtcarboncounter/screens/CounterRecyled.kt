@@ -1,4 +1,4 @@
-package com.example.carbon_counter.screens
+package com.example.edtcarboncounter.screens
 
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
@@ -7,7 +7,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
-import com.example.carbon_counter.NavRoutes
+
+import com.example.edtcarboncounter.NavRoutes
 
 @Composable
 fun CounterRecycled(navController: NavHostController) {

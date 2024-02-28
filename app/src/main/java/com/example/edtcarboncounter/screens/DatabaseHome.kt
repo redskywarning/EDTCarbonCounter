@@ -1,4 +1,4 @@
-package com.example.carbon_counter.screens
+package com.example.edtcarboncounter.screens
 
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable

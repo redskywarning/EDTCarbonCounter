@@ -10,12 +10,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.carbon_counter.screens.*
+import com.example.edtcarboncounter.screens.*
 import com.example.edtcarboncounter.ui.theme.EDTCarbonCounterTheme
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.carbon_counter.screens.*
 
 class MainActivity : ComponentActivity() {
     //TEST
