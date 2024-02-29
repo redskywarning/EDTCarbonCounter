@@ -11,6 +11,7 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.edtcarboncounter.database.ADatabaseState
 
@@ -40,13 +41,15 @@ fun AddContactDialog(
                     }
                 )
                 TextField(
-                    value = state.carbonContent,
+                    value = state.carbonContent.toString(),
                     onValueChange = {
-                        onEvent(ADatabaseEvent.SetCarbonContent(it))
+                        val carbonContent = it.toLongOrNull() ?: 0L
+                        onEvent(ADatabaseEvent.SetCarbonContent(carbonContent))
                     },
                     placeholder = {
                         Text(text = "Carbon Content in kgCO2 per 1kg of material")
                     }
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
                 )
             }
         },
