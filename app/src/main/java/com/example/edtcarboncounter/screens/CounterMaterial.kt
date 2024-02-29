@@ -1,20 +1,16 @@
 package com.example.edtcarboncounter.screens
 
 import android.widget.Toast
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material.icons.outlined.Search
@@ -54,10 +50,10 @@ fun CounterMaterial(navController: NavHostController) {
         }
 
     ) {
-        //content area
-        materialCards()
-
-
+        Column(modifier = Modifier.verticalScroll(rememberScrollState())){
+            materialCards()
+            Spacer(modifier = Modifier.padding(10.dp))
+        }
     }
 }
 
@@ -65,19 +61,60 @@ fun CounterMaterial(navController: NavHostController) {
 fun materialCards() {
     Card(
         modifier = Modifier
-            .height(height = 200.dp)
+            //.height(height = 200.dp)
             .fillMaxWidth()
             .padding(all = 20.dp)
-            //.background(color = Color(0xFFBB0189))
+            .border(border = BorderStroke(1.dp, Color.Black)),
+
+    //.background(color = Color(0xFFBB0189))
     ) {
-        Column() {
+        Column {
             Row() {
-                Text("New Material", textAlign = TextAlign.Left, fontSize = 15.sp)
+                Text("New Material", textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(15.dp))
             }
+            //Main Material Content
             Row() {
-                var mExpanded by remember { mutableStateOf(false) }
-                Demo_ExposedDropdownMenuBox()
+                MaterialDropdownMenuBox()
+
+                var cmaterialWeight by remember { mutableStateOf("")}
+                val onMaterialWeightChange = { text: String->
+                    cmaterialWeight = text
+                }
+                OutlinedTextField(
+                    value = cmaterialWeight,
+                    onValueChange = onMaterialWeightChange,
+                    modifier = Modifier
+                        .width(250.dp)
+                        .padding(horizontal = 10.dp),
+                    label = {Text("Material Mass / kg")}
+                )
             }
+            //Add another Transport Card
+            //Transport Content
+            var transportAddYes by remember { mutableStateOf(0)}
+            Button(onClick = {transportAddYes += 1}, modifier = Modifier.padding(horizontal = 10.dp),colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff2EC4B6))) {
+                Text(text = "Add transport")
+            }
+            for (transport in 1..transportAddYes) {
+                TransportAdd()
+            }
+            Spacer(modifier = Modifier.padding(2.5.dp))
+//            Row() {
+//               TransportDropdownMenuBox()
+//                var transportDistance by remember { mutableStateOf("")}
+//                val onMaterialWeightChange = { text: String->
+//                    transportDistance = text
+//                }
+//                OutlinedTextField(
+//                    value = transportDistance,
+//                    onValueChange = onMaterialWeightChange,
+//                    modifier = Modifier
+//                        .width(250.dp)
+//                        .padding(horizontal = 10.dp),
+//                    label = {Text("Distance / km")}
+//                )
+//            }
+//            Spacer(modifier = Modifier.padding(10.dp))
         }
 
 //        Text(
@@ -90,14 +127,14 @@ fun materialCards() {
 }
 
 @Composable
-fun Demo_ExposedDropdownMenuBox() {
+fun MaterialDropdownMenuBox() {
 
     var mExpanded by remember { mutableStateOf(false) }
     var noMaterialFound: Int = 0
     var materialItemSelected: Int = 0
     // Create a list of cities
     val mMaterials = listOf("Delhi", "Mumbai", "Chennai", "Kolkata", "Hyderabad", "Bengaluru", "Pune")
-
+    //val mMaterials = listOf<String>()
     // Create a string value to store the selected city
     var mSelectedText by remember { mutableStateOf("") }
     var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
@@ -108,7 +145,7 @@ fun Demo_ExposedDropdownMenuBox() {
     else
         Icons.Filled.KeyboardArrowDown
 
-    Column(Modifier.padding(20.dp)) {
+    Column(Modifier.padding(horizontal = 10.dp)) {
 
         // Create an Outlined Text Field
         // with icon and not expanded
@@ -158,6 +195,113 @@ fun Demo_ExposedDropdownMenuBox() {
                     //Call function to create pop up to add to database
                 }) {
                     Text(text = "Add to Database")
+                }
+            }
+//            mMaterials.forEach { label ->
+//                DropdownMenuItem(onClick = {
+//                    mSelectedText = label
+//                    mExpanded = false
+//                }) {
+//                    Text(text = label)
+//                }
+//            }
+        }
+    }
+}
+
+@Composable
+fun TransportAdd() {
+    Spacer(modifier = Modifier.padding(2.5.dp))
+    Row() {
+        TransportDropdownMenuBox()
+        var transportDistance by remember { mutableStateOf("")}
+        val onMaterialWeightChange = { text: String->
+            transportDistance = text
+        }
+        OutlinedTextField(
+            value = transportDistance,
+            onValueChange = onMaterialWeightChange,
+            modifier = Modifier
+                .width(250.dp)
+                .padding(horizontal = 10.dp),
+            label = {Text("Distance / km")}
+        )
+        IconButton(onClick = { /*TODO*/ }) {
+            Icon(Icons.Default.Delete, contentDescription = "Localized description")
+        }
+    }
+    Spacer(modifier = Modifier.padding(2.5.dp))
+}
+
+@Composable
+fun TransportDropdownMenuBox() {
+
+    var mExpanded by remember { mutableStateOf(false) }
+    var noTransportFound: Int = 0
+    var transportSelected: Int = 0
+
+    val mTransport = listOf("Delhi", "Mumbai", "Chennai", "Kolkata", "Hyderabad", "Bengaluru", "Pune")
+    //val mTransport = listOf<String>()
+    // Create a string value to store the selected city
+    var mSelectedText by remember { mutableStateOf("") }
+    var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
+
+    // Up Icon when expanded and down icon when collapsed
+    val icon = if (mExpanded)
+        Icons.Filled.KeyboardArrowUp
+    else
+        Icons.Filled.KeyboardArrowDown
+
+    Column(Modifier.padding(horizontal = 10.dp)) {
+
+        // Create an Outlined Text Field
+        // with icon and not expanded
+        OutlinedTextField(
+            value = mSelectedText,
+            onValueChange = { mSelectedText = it
+                mExpanded = true
+            },
+            modifier = Modifier
+                .width(250.dp)
+                .onGloballyPositioned { coordinates ->
+                    // This value is used to assign to
+                    // the DropDown the same width
+                    mTextFieldSize = coordinates.size.toSize()
+                },
+            label = {Text("Transport")},
+            trailingIcon = {
+                Icon(icon,"contentDescription",
+                    Modifier.clickable { mExpanded = !mExpanded })
+            }
+        )
+
+        // Create a drop-down menu with list of cities,
+        // when clicked, set the Text Field text as the city selected
+        DropdownMenu(
+            expanded = mExpanded,
+            onDismissRequest = { mExpanded = false },
+            properties = PopupProperties(focusable = false),
+            modifier = Modifier
+                .width(with(LocalDensity.current){mTextFieldSize.width.toDp()})
+        ) {
+            for (Transport in mTransport) {
+                if (mSelectedText.uppercase() in Transport.uppercase()) {
+                    noTransportFound = 1
+                    DropdownMenuItem(onClick = {
+                        mSelectedText = Transport
+                        mExpanded = false
+                        transportSelected = 1
+                    }) {
+                        Text(text = Transport)
+                    }
+                }
+            }
+            if(noTransportFound == 0) {
+                //Add in option to add to database
+                DropdownMenuItem(onClick = {
+                    //Call function to create pop up to add to database
+                }) {
+                    Text(text = "Add to Transport Database")
                 }
             }
 //            mMaterials.forEach { label ->
