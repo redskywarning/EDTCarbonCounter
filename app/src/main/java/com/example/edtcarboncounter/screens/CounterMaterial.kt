@@ -51,6 +51,10 @@ fun CounterMaterial(navController: NavHostController) {
 
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())){
+            Text(
+                "Materials", fontSize = 40.sp, modifier = Modifier.padding(top = 20.dp).align(Alignment.CenterHorizontally)
+            )
+
             var materialAddYes by remember { mutableStateOf(0)}
             Button(onClick = {materialAddYes += 1}, modifier = Modifier.padding(horizontal = 10.dp),colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff2EC4B6))) {
                 Text(text = "Add Material")
