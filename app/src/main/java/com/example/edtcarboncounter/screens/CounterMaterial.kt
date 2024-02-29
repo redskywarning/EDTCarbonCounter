@@ -51,8 +51,15 @@ fun CounterMaterial(navController: NavHostController) {
 
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())){
+            var materialAddYes by remember { mutableStateOf(1)}
+            Button(onClick = {materialAddYes += 1}, modifier = Modifier.padding(horizontal = 10.dp),colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff2EC4B6))) {
+                Text(text = "Add Material")
+            }
+            for (transport in 2..materialAddYes) {
+                materialCards()
+            }
             materialCards()
-            Spacer(modifier = Modifier.padding(10.dp))
+            Spacer(modifier = Modifier.padding(20.dp))
         }
     }
 }
@@ -70,7 +77,11 @@ fun materialCards() {
     ) {
         Column {
             Row() {
-                Text("New Material", textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(15.dp))
+                IconButton(onClick = {/*TODO*/}) {
+                    Icon(Icons.Default.Delete, contentDescription = "Localized description")
+                }
+                Text("Material:", textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
+
             }
             //Main Material Content
             Row() {
@@ -211,26 +222,52 @@ fun MaterialDropdownMenuBox() {
 
 @Composable
 fun TransportAdd() {
-    Spacer(modifier = Modifier.padding(2.5.dp))
-    Row() {
-        TransportDropdownMenuBox()
-        var transportDistance by remember { mutableStateOf("")}
-        val onMaterialWeightChange = { text: String->
-            transportDistance = text
+    var transportYes by remember { mutableStateOf(true)}
+    //while (true) {
+
+
+        Spacer(modifier = Modifier.padding(2.5.dp))
+        Row() {
+            TransportDropdownMenuBox()
+            var transportDistance by remember { mutableStateOf("")}
+            val onMaterialWeightChange = { text: String->
+                transportDistance = text
+            }
+            OutlinedTextField(
+                value = transportDistance,
+                onValueChange = onMaterialWeightChange,
+                modifier = Modifier
+                    .width(250.dp)
+                    .padding(horizontal = 10.dp),
+                label = {Text("Distance / km")}
+            )
+            IconButton(onClick = {transportYes = false}) {
+                Icon(Icons.Default.Delete, contentDescription = "Localized description")
+            }
         }
-        OutlinedTextField(
-            value = transportDistance,
-            onValueChange = onMaterialWeightChange,
-            modifier = Modifier
-                .width(250.dp)
-                .padding(horizontal = 10.dp),
-            label = {Text("Distance / km")}
-        )
-        IconButton(onClick = { /*TODO*/ }) {
-            Icon(Icons.Default.Delete, contentDescription = "Localized description")
-        }
-    }
-    Spacer(modifier = Modifier.padding(2.5.dp))
+        Spacer(modifier = Modifier.padding(2.5.dp))
+    //}
+
+//    Spacer(modifier = Modifier.padding(2.5.dp))
+//    Row() {
+//        TransportDropdownMenuBox()
+//        var transportDistance by remember { mutableStateOf("")}
+//        val onMaterialWeightChange = { text: String->
+//            transportDistance = text
+//        }
+//        OutlinedTextField(
+//            value = transportDistance,
+//            onValueChange = onMaterialWeightChange,
+//            modifier = Modifier
+//                .width(250.dp)
+//                .padding(horizontal = 10.dp),
+//            label = {Text("Distance / km")}
+//        )
+//        IconButton(onClick = { /*TODO*/ }) {
+//            Icon(Icons.Default.Delete, contentDescription = "Localized description")
+//        }
+//    }
+//    Spacer(modifier = Modifier.padding(2.5.dp))
 }
 
 @Composable
