@@ -51,21 +51,44 @@ fun CounterMaterial(navController: NavHostController) {
 
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())){
-            var materialAddYes by remember { mutableStateOf(1)}
+            var materialAddYes by remember { mutableStateOf(0)}
             Button(onClick = {materialAddYes += 1}, modifier = Modifier.padding(horizontal = 10.dp),colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff2EC4B6))) {
                 Text(text = "Add Material")
             }
-            for (transport in 2..materialAddYes) {
-                materialCards()
+            for (material in 1..materialAddYes) {
+                var showCard1 by remember {mutableStateOf( true)}
+                //materialCards(onDeleteClicked = { showCard1 = false })
+                if(showCard1) {
+                    materialCards(onDeleteClicked = { showCard1 = false })
+                }
+                else {
+                    Card () {
+
+                    }
+                    //materialAddYes -= 1
+                }
+//                var showCard1 by remember {mutableStateOf( true)}
+//                materialCards(onDeleteClicked = { showCard1 = false })
             }
-            materialCards()
+            Surface() {
+                var showCard by remember {mutableStateOf( true)}
+                if(showCard) {
+                    materialCards(onDeleteClicked = { showCard = false })
+                }
+                else {
+                    Card () {
+
+                    }
+                }
+            }
+            //materialCards()
             Spacer(modifier = Modifier.padding(20.dp))
         }
     }
 }
 
 @Composable
-fun materialCards() {
+fun materialCards(onDeleteClicked: () -> Unit) {
     Card(
         modifier = Modifier
             //.height(height = 200.dp)
@@ -77,7 +100,7 @@ fun materialCards() {
     ) {
         Column {
             Row() {
-                IconButton(onClick = {/*TODO*/}) {
+                IconButton(onClick = onDeleteClicked) {
                     Icon(Icons.Default.Delete, contentDescription = "Localized description")
                 }
                 Text("Material:", textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
@@ -106,8 +129,20 @@ fun materialCards() {
             Button(onClick = {transportAddYes += 1}, modifier = Modifier.padding(horizontal = 10.dp),colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff2EC4B6))) {
                 Text(text = "Add transport")
             }
+
             for (transport in 1..transportAddYes) {
-                TransportAdd()
+                var showCardt by remember {mutableStateOf( true)}
+                //TransportAdd(onDeleteClicked = { showCardt = false })
+                if(showCardt) {
+                    TransportAdd(onDeleteClicked = { showCardt = false })
+                }
+                else {
+                    Card () {
+
+                    }
+                    //transportAddYes -= 1
+                }
+                //TransportAdd()
             }
             Spacer(modifier = Modifier.padding(2.5.dp))
 //            Row() {
@@ -221,10 +256,10 @@ fun MaterialDropdownMenuBox() {
 }
 
 @Composable
-fun TransportAdd() {
-    var transportYes by remember { mutableStateOf(true)}
+fun TransportAdd(onDeleteClicked: () -> Unit) {
+    //var transportYes by remember { mutableStateOf(true)}
     //while (true) {
-
+    Card () {
 
         Spacer(modifier = Modifier.padding(2.5.dp))
         Row() {
@@ -241,12 +276,12 @@ fun TransportAdd() {
                     .padding(horizontal = 10.dp),
                 label = {Text("Distance / km")}
             )
-            IconButton(onClick = {transportYes = false}) {
+            IconButton(onClick = onDeleteClicked) {
                 Icon(Icons.Default.Delete, contentDescription = "Localized description")
             }
         }
         Spacer(modifier = Modifier.padding(2.5.dp))
-    //}
+    }
 
 //    Spacer(modifier = Modifier.padding(2.5.dp))
 //    Row() {
