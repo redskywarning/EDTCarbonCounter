@@ -69,7 +69,7 @@ fun CounterMaterial(navController: NavHostController) {
                     Card () {
 
                     }
-                    //materialAddYes -= 1
+                    materialAddYes -= 1
                 }
 //                var showCard1 by remember {mutableStateOf( true)}
 //                materialCards(onDeleteClicked = { showCard1 = false })
@@ -242,6 +242,7 @@ fun MaterialDropdownMenuBox() {
             if(noMaterialFound == 0) {
                 //Add in option to add to database
                 DropdownMenuItem(onClick = {
+                    /*TODO*/
                     //Call function to create pop up to add to database
                 }) {
                     Text(text = "Add to Database")

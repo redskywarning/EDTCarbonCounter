@@ -1,3 +1,3 @@
-package com.example.edtcarboncounter.classes
+package com.example.edtcarboncounter.data
 
 class transportObject (val type: String, val distance: Long)

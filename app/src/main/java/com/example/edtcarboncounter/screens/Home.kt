@@ -43,7 +43,7 @@ fun Home(navController: NavHostController) {
             Box (modifier = Modifier
                 .padding(horizontal = 30.dp)
                 .fillMaxWidth()
-                .clickable(onClick = { navController.navigate(NavRoutes.CounterMaterial.route) })
+                .clickable(onClick = { navController.navigate(NavRoutes.CounterProject.route) })
                 .background(Color.LightGray)
                 .height(100.dp),
                 contentAlignment = Alignment.Center){
@@ -59,16 +59,16 @@ fun Home(navController: NavHostController) {
                 contentAlignment = Alignment.Center){
                 Text("Carbon Comparison", textAlign = TextAlign.Center, fontSize = 30.sp)
             }
-            Spacer(modifier = Modifier.size(40.dp))
-            Box (modifier = Modifier
-                .padding(horizontal = 30.dp)
-                .fillMaxWidth()
-                .clickable(onClick = { navController.navigate(NavRoutes.DatabaseHome.route) })
-                .background(Color.LightGray)
-                .height(100.dp),
-                contentAlignment = Alignment.Center){
-                Text("Database", textAlign = TextAlign.Center, fontSize = 30.sp)
-            }
+//            Spacer(modifier = Modifier.size(40.dp))
+//            Box (modifier = Modifier
+//                .padding(horizontal = 30.dp)
+//                .fillMaxWidth()
+//                .clickable(onClick = { navController.navigate(NavRoutes.DatabaseHome.route) })
+//                .background(Color.LightGray)
+//                .height(100.dp),
+//                contentAlignment = Alignment.Center){
+//                Text("Database", textAlign = TextAlign.Center, fontSize = 30.sp)
+//            }
             Spacer(modifier = Modifier.size(40.dp))
             Box (modifier = Modifier
                 .padding(horizontal = 30.dp)
