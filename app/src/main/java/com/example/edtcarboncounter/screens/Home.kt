@@ -101,12 +101,12 @@ fun topBar(navController: NavHostController){
             Text(text = "")
 
         },
-        navigationIcon = {
-            //navigate up takes you back
-            IconButton(onClick = {navController.navigateUp()}) {
-                Icon(Icons.Filled.ArrowBack, "backIcon")
-            }
-        },
+//        navigationIcon = {
+//            //navigate up takes you back
+//            IconButton(onClick = {navController.navigateUp()}) {
+//                Icon(Icons.Filled.ArrowBack, "backIcon")
+//            }
+//        },
         backgroundColor = Color.LightGray,
         contentColor = Color.Black,
         elevation = 10.dp,

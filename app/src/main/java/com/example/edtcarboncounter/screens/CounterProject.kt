@@ -34,27 +34,23 @@ fun CounterProject(navController: NavHostController) {
         //content area
         //IM AWARE THERE IS A PROBLEM WITH FORMATTING AND CENTERING - IM NOT SURE HOW TO FIX
         //SUGGESTIONS WELCOME
-        Column(){
-            Row(verticalAlignment = Alignment.CenterVertically) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()){
                 Text(
                     "Project Name", fontSize = 40.sp, modifier = Modifier
                         .padding(top = 20.dp), textAlign = TextAlign.Center
                 )
-            }
-            Spacer(modifier = Modifier.padding(10.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
+
+                Spacer(modifier = Modifier.padding(10.dp))
                 Text(
                     "Please enter your project name", fontSize = 25.sp, modifier = Modifier
                         .padding(top = 20.dp), textAlign = TextAlign.Center
                 )
-            }
-
-            Spacer(modifier = Modifier.padding(20.dp))
-            var projectName by remember { mutableStateOf("") }
-            val onprojectNameChange = { text: String->
-                projectName = text
-            }
-            Row(verticalAlignment = Alignment.CenterVertically) {
+                Spacer(modifier = Modifier.padding(20.dp))
+                var projectName by remember { mutableStateOf("") }
+                val onprojectNameChange = { text: String->
+                    projectName = text
+                }
                 OutlinedTextField(
                     value = projectName,
                     onValueChange = onprojectNameChange,
@@ -63,22 +59,17 @@ fun CounterProject(navController: NavHostController) {
                         .padding(horizontal = 10.dp),
                     label = {Text("Project Name")}
                 )
-            }
-
-            Spacer(modifier = Modifier.padding(20.dp))
-            var buttonYes by remember{mutableStateOf(false)}
-            Row(verticalAlignment = Alignment.CenterVertically) {
+                Spacer(modifier = Modifier.padding(20.dp))
+                var buttonYes by remember{mutableStateOf(false)}
                 Button(onClick = {buttonYes = true}, modifier = Modifier.padding(horizontal = 10.dp),colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff2EC4B6))) {
                     Text(text = "Choose Name")
                 }
-            }
-            if (buttonYes){
-                buttonYes = false
-                Validate(navController = navController, projectName = projectName)
+                if (buttonYes){
+                    buttonYes = false
+                    Validate(navController = navController, projectName = projectName)
+                }
             }
         }
-
-
     }
 }
 
