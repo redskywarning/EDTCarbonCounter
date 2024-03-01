@@ -32,33 +32,45 @@ fun CounterProject(navController: NavHostController) {
 //        }
     ) {
         //content area
-        Column(verticalArrangement = Arrangement.Center){
-            Text(
-                "Project Name", fontSize = 40.sp, modifier = Modifier
-                    .padding(top = 20.dp), textAlign = TextAlign.Center
-            )
+        //IM AWARE THERE IS A PROBLEM WITH FORMATTING AND CENTERING - IM NOT SURE HOW TO FIX
+        //SUGGESTIONS WELCOME
+        Column(){
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "Project Name", fontSize = 40.sp, modifier = Modifier
+                        .padding(top = 20.dp), textAlign = TextAlign.Center
+                )
+            }
             Spacer(modifier = Modifier.padding(10.dp))
-            Text(
-                "Please enter your project name", fontSize = 25.sp, modifier = Modifier
-                    .padding(top = 20.dp), textAlign = TextAlign.Center
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "Please enter your project name", fontSize = 25.sp, modifier = Modifier
+                        .padding(top = 20.dp), textAlign = TextAlign.Center
+                )
+            }
+
             Spacer(modifier = Modifier.padding(20.dp))
             var projectName by remember { mutableStateOf("") }
             val onprojectNameChange = { text: String->
                 projectName = text
             }
-            OutlinedTextField(
-                value = projectName,
-                onValueChange = onprojectNameChange,
-                modifier = Modifier
-                    .width(250.dp)
-                    .padding(horizontal = 10.dp).align(alignment = Alignment.CenterHorizontally),
-                label = {Text("Project Name")}
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                OutlinedTextField(
+                    value = projectName,
+                    onValueChange = onprojectNameChange,
+                    modifier = Modifier
+                        .width(250.dp)
+                        .padding(horizontal = 10.dp),
+                    label = {Text("Project Name")}
+                )
+            }
+
             Spacer(modifier = Modifier.padding(20.dp))
             var buttonYes by remember{mutableStateOf(false)}
-                    Button(onClick = {buttonYes = true}, modifier = Modifier.padding(horizontal = 10.dp),colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff2EC4B6))) {
-                Text(text = "Choose Name")
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Button(onClick = {buttonYes = true}, modifier = Modifier.padding(horizontal = 10.dp),colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff2EC4B6))) {
+                    Text(text = "Choose Name")
+                }
             }
             if (buttonYes){
                 buttonYes = false
@@ -74,7 +86,6 @@ fun CounterProject(navController: NavHostController) {
 fun Validate(navController: NavHostController, projectName: String) {
     if (projectName == "") {
         val context = LocalContext.current
-        projectNamesList += projectName
         Toast.makeText(context, "Please Enter a Project Name", Toast.LENGTH_SHORT).show()
     }
     //To Check no repeats of project name
@@ -84,6 +95,9 @@ fun Validate(navController: NavHostController, projectName: String) {
     }
     else {
         project.projectName = projectName
-        navController.navigate(NavRoutes.CounterReceipt.route)
+        projectNamesList += projectName
+        //HELP
+        //KATIE THIS IS WHERE THE PROJECT NAME INPUT IS - ENJOY
+        navController.navigate(NavRoutes.CounterMaterial.route)
     }
 }
