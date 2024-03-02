@@ -6,5 +6,5 @@ package com.example.edtcarboncounter.data
 // Deleted = 1
 //Not Deleted = 0
 
-class materialObject (var material: String, var Smkg: String, var Lmkg: Long, var transports: List<transportObject>, var recyclable: Int, var deleted: Int)
+class materialObject (var material: String, var Smkg: String, var Lmkg: Long, var transports: MutableList<transportObject>, var recyclable: Int, var deleted: Int)
 
