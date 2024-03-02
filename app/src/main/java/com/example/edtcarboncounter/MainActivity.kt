@@ -75,5 +75,8 @@ fun MainScreen() {
         composable(NavRoutes.CarbonComparison.route){
             CarbonComparison(navController = navController)
         }
+        composable(NavRoutes.CounterProject.route){
+            CounterProject(navController = navController)
+        }
     }
 }
