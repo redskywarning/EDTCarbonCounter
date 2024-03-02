@@ -481,7 +481,7 @@ fun TransportDropdownMenuBox() {
 
 @Composable
 fun Validation(navController: NavHostController) {
-    var allValid by remember{mutableStateOf(true)}
+    var allValid = true
     for (material in project.materials) {
         if (material.deleted ==1) {
             project.materials.remove(material)
@@ -490,11 +490,13 @@ fun Validation(navController: NavHostController) {
             allValid = false
             val context = LocalContext.current
             Toast.makeText(context, "Please select a material in the database", Toast.LENGTH_SHORT).show()
+            return
         }
         else if(material.Smkg.toLongOrNull() == null) {
             allValid = false
             val context = LocalContext.current
             Toast.makeText(context, "Material Weights must be numbers", Toast.LENGTH_SHORT).show()
+            return
         } else if(material.Smkg.toLongOrNull() != null) {
             material.Lmkg = material.Smkg.toLong()
         }
@@ -506,12 +508,13 @@ fun Validation(navController: NavHostController) {
                 allValid = false
                 val context = LocalContext.current
                 Toast.makeText(context, "Please select a transport type in the database", Toast.LENGTH_SHORT).show()
+                return
             }
             else if(transport.Sdistance.toLongOrNull() == null) {
                 allValid = false
                 val context = LocalContext.current
                 Toast.makeText(context, "Distances must be numbers", Toast.LENGTH_SHORT).show()
-
+                return
             } else if(transport.Sdistance.toLongOrNull() != null) {
                 transport.Ldistance = transport.Sdistance.toLong()
             }
@@ -519,5 +522,8 @@ fun Validation(navController: NavHostController) {
     }
     if (allValid) {
         navController.navigate(NavRoutes.CounterRecycled.route)
+    }
+    else {
+        return
     }
 }
