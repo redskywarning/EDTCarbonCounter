@@ -3,5 +3,8 @@ package com.example.edtcarboncounter.data
 //Recyclable = 1
 //Non Recyclable = 0
 
-class materialObject (val material: String, val mkg: Long, var transports: List<transportObject>, val recyclable: Int)
+// Deleted = 1
+//Not Deleted = 0
+
+class materialObject (var material: String, var Smkg: String, var Lmkg: Long, var transports: List<transportObject>, var recyclable: Int, var deleted: Int)
 

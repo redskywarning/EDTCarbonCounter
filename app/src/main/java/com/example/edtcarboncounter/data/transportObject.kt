@@ -1,3 +1,6 @@
 package com.example.edtcarboncounter.data
 
-class transportObject (val type: String, val distance: Long)
+//deleted = 1
+//not deleted = 0
+
+class transportObject (var type: String, var Sdistance: String, var Ldistance: Long, var deleted: Int)

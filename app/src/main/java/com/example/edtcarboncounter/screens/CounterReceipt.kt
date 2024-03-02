@@ -49,4 +49,9 @@ fun CounterReceipt(navController: NavHostController) {
         }
 
     }
+
+    @Composable
+    fun resetProjectObject() {
+
+    }
 }
