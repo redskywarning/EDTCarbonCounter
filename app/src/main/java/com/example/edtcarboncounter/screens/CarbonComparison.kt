@@ -1,88 +1,207 @@
 package com.example.edtcarboncounter.screens
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.MaterialTheme
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Card
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.window.PopupProperties
 import androidx.navigation.NavHostController
 
+val lMaterials = listOf("Delhi", "Mumbai", "Chennai", "Kolkata", "Hyderabad", "Bengaluru", "Pune")
+val lTransport = listOf("Delhi", "Mumbai", "Chennai", "Kolkata", "Hyderabad", "Bengaluru", "Pune")
 
-
-
-// Remove unnecessary imports
 
 @Composable
 fun CarbonComparison(navController: NavHostController) {
     Scaffold(
         topBar = { topBar(navController = navController) },
-        bottomBar = { BottomBar(navController = navController) }
+        bottomBar = { BottomBar(navController = navController) },
+        floatingActionButton = {
+            var nextPage by remember { mutableStateOf(false) }
+            FloatingActionButton(onClick = { nextPage = true }) {
+                Icon(Icons.Default.ArrowForward, contentDescription = "Add")
+            }
+            if (nextPage) {
+                Validation(navController = navController)
+            }
+        }
     ) {
-        Column(
-            modifier = Modifier
-                .background(Color.White)
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             Text(
-                text = "Carbon Comparison",
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(30.dp),
-                style = MaterialTheme.typography.h3
+                "Materials", fontSize = 40.sp,
+                modifier = Modifier.padding(top = 20.dp).align(Alignment.CenterHorizontally)
             )
-            Spacer(modifier = Modifier.size(15.dp))
-
-            // Display the table
-            CarbonTable()
+            var comparisonNum by remember { mutableStateOf(0) }
+            var comparisonAddYes by remember { mutableStateOf(0) }
+            Button(
+                onClick = { comparisonAddYes += 1; comparisonNum += 1 },
+                modifier = Modifier.padding(horizontal = 10.dp),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff2EC4B6))
+            ) {
+                Text(text = "Add Comparison")
+            }
+            Surface() {
+                for (comparison in 1..comparisonAddYes) {
+                    comparisonCard(onDeleteClicked = {}, comparisonNum = comparison)
+                }
+            }
+            Spacer(modifier = Modifier.padding(20.dp))
         }
     }
 }
 
 @Composable
-fun CarbonTable() {
-    Column(modifier = Modifier.padding(16.dp)) {
-        // Header row
-        Row {
-            Text(
-                text = "Metal",
-                modifier = Modifier.weight(1f),
-                style = TextStyle(fontSize = 50.sp, fontWeight = FontWeight.Bold) // Adjust font size and style
-            )
-            Text(
-                text = "Percentage",
-                modifier = Modifier.weight(1f),
-                style = TextStyle(fontSize = 50.sp, fontWeight = FontWeight.Bold) // Adjust font size and style
-            )
+fun comparisonCard(onDeleteClicked: () -> Unit, comparisonNum: Int) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(all = 20.dp)
+            .border(border = BorderStroke(1.dp, Color.Black))
+    ) {
+        Column {
+            Row() {
+                IconButton(onClick = onDeleteClicked) {
+                    Icon(Icons.Default.Delete, contentDescription = "Localized description")
+                }
+                Text(
+                    "Comparison $comparisonNum:",
+                    textAlign = TextAlign.Left,
+                    fontSize = 15.sp,
+                    modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp)
+                )
+            }
+            MaterialDropdownMenu("Material 1")
+        Column {
+            Row() {
+                IconButton(onClick = onDeleteClicked) {
+                    Icon(Icons.Default.Delete, contentDescription = "Localized description")
+                }
+                Text(
+                    "Comparison $comparisonNum:",
+                    textAlign = TextAlign.Left,
+                    fontSize = 15.sp,
+                    modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp)
+                )
+            }
+            MaterialDropdownMenu("Material 2")
         }
-        // Data rows
-        Row {
-            Text(
-                text = "Steel",
-                modifier = Modifier.weight(1f),
-                style = TextStyle(fontSize = 50.sp, fontWeight = FontWeight.Bold) // Adjust font size
-            )
-            Text(
-                text = "80%",
-                modifier = Modifier.weight(1f),
-                style = TextStyle(fontSize = 50.sp, fontWeight = FontWeight.Bold) // Adjust font size
-            )
+            Button(
+                onClick = { /* Calculate functionality */ },
+                modifier = Modifier.padding(horizontal = 10.dp),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff2EC4B6))
+            ) {
+                Text(text = "Calculate")
+                //Then click calculate, somehow get data from the database and calculate cabron saved - taking away some stuff?
+            }
         }
-        // Add more rows as needed
     }
 }
+
+@Composable
+fun MaterialDropdownMenu(label: String) {
+    var mExpanded by remember { mutableStateOf(false) }
+    var noMaterialFound: Int = 0
+    var materialItemSelected: Int = 0
+    val mMaterials = listOf("Delhi", "Mumbai", "Chennai", "Kolkata", "Hyderabad", "Bengaluru", "Pune")
+    var mSelectedText by remember { mutableStateOf("") }
+    var mTextFieldSize by remember { mutableStateOf(Size.Zero) }
+
+    val icon = if (mExpanded)
+        Icons.Filled.KeyboardArrowUp
+    else
+        Icons.Filled.KeyboardArrowDown
+
+    Column(Modifier.padding(horizontal = 10.dp)) {
+        OutlinedTextField(
+            value = mSelectedText,
+            onValueChange = { mSelectedText = it },
+            modifier = Modifier
+                .width(250.dp)
+                .onGloballyPositioned { coordinates ->
+                    mTextFieldSize = coordinates.size.toSize()
+                },
+            label = { Text(label) },
+            trailingIcon = {
+                Icon(
+                    icon, "contentDescription",
+                    Modifier.clickable { mExpanded = !mExpanded }
+                )
+            }
+        )
+
+        DropdownMenu(
+            expanded = mExpanded,
+            onDismissRequest = { mExpanded = false },
+            properties = PopupProperties(focusable = false),
+            modifier = Modifier
+                .width(with(LocalDensity.current) { mTextFieldSize.width.toDp() })
+        ) {
+            for (material in mMaterials) {
+                if (mSelectedText.uppercase() in material.uppercase()) {
+                    noMaterialFound = 1
+                    DropdownMenuItem(onClick = {
+
+                    mSelectedText = material
+                        mExpanded = false
+                        materialItemSelected = 1
+                    }) {
+                        Text(text = material)
+                    }
+                }
+            }
+            if(noMaterialFound == 0) {
+                //Add in option to add to database
+                DropdownMenuItem(onClick = {
+                    /*TODO*/
+                    //HELP KATIE
+                    //Call function to create pop up to add to database
+                }) {
+                    Text(text = "Add to Database")
+                }
+            }
+        }
+    }
+}
+
+
 
 
