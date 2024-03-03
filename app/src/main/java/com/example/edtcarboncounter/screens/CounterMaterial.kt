@@ -92,49 +92,6 @@ fun CounterMaterial(navController: NavHostController) {
                 }
             }
             Spacer(modifier = Modifier.padding(20.dp))
-            var allValid = true
-//            for (material in project.materials) {
-//                if (material.deleted ==1) {
-//                    project.materials.remove(material)
-//                }
-//                Text(material.material, textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
-//                Text(material.Smkg, textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
-//
-////        else if(material.material !in mMaterials){
-////            allValid = false
-////            val context = LocalContext.current
-////            Toast.makeText(context, "Please select a material in the database", Toast.LENGTH_SHORT).show()
-////            return
-////        }
-////        else if(material.Smkg.toLongOrNull() == null) {
-////            allValid = false
-////            val context = LocalContext.current
-////            Toast.makeText(context, "Material Weights must be numbers", Toast.LENGTH_SHORT).show()
-////            return
-////        } else if(material.Smkg.toLongOrNull() != null) {
-////            material.Lmkg = material.Smkg.toLong()
-////        }
-//                for (transport in material.transports) {
-//                    if (transport.deleted ==1) {
-//                        material.transports.remove(transport)
-//                    }
-//                    else if(transport.type !in mTransport){
-//                        allValid = false
-//                        val context = LocalContext.current
-//                        Toast.makeText(context, "Please select a transport type in the database", Toast.LENGTH_SHORT).show()
-//
-//                    }
-//                    else if(transport.Sdistance.toLongOrNull() == null) {
-//                        allValid = false
-//                        val context = LocalContext.current
-//                        Toast.makeText(context, "Distances must be numbers", Toast.LENGTH_SHORT).show()
-//
-//                    } else if(transport.Sdistance.toLongOrNull() != null) {
-//                        transport.Ldistance = transport.Sdistance.toLong()
-//                    }
-//                }
-//            }
-
         }
     }
 }
@@ -154,7 +111,7 @@ fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                
                 IconButton(onClick = onDeleteClicked) {
                     Icon(Icons.Default.Delete, contentDescription = "Localized description")
                 }
-                Text("Material "+materialNum+ ":", textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
+                Text("Material:", textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
 
             }
             project.materials += materialObject(material = "",Smkg = "", Lmkg = 0, transports = mutableListOf<transportObject>(),recyclable = 0, deleted = 0)
