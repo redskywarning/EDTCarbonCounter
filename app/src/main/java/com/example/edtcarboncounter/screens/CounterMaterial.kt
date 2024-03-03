@@ -39,7 +39,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import java.util.Collections.emptyList
 
-val mMaterials = listOf("Delhi", "Mumbai", "Chennai", "Kolkata", "Hyderabad", "Bengaluru", "Pune")
+val mMaterials = listOf("Delhi", "Mumbai", "Chennai", "Kolkata", "Hyderabad", "Bengaluru", "Pune", "1")
 val mTransport = listOf("Delhi", "Mumbai", "Chennai", "Kolkata", "Hyderabad", "Bengaluru", "Pune")
 
 @Composable
@@ -53,6 +53,7 @@ fun CounterMaterial(navController: NavHostController) {
             }
             if(nextPage) {
                 Validation(navController = navController)
+                nextPage = false
             }
         }
 
@@ -91,6 +92,49 @@ fun CounterMaterial(navController: NavHostController) {
                 }
             }
             Spacer(modifier = Modifier.padding(20.dp))
+            var allValid = true
+//            for (material in project.materials) {
+//                if (material.deleted ==1) {
+//                    project.materials.remove(material)
+//                }
+//                Text(material.material, textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
+//                Text(material.Smkg, textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
+//
+////        else if(material.material !in mMaterials){
+////            allValid = false
+////            val context = LocalContext.current
+////            Toast.makeText(context, "Please select a material in the database", Toast.LENGTH_SHORT).show()
+////            return
+////        }
+////        else if(material.Smkg.toLongOrNull() == null) {
+////            allValid = false
+////            val context = LocalContext.current
+////            Toast.makeText(context, "Material Weights must be numbers", Toast.LENGTH_SHORT).show()
+////            return
+////        } else if(material.Smkg.toLongOrNull() != null) {
+////            material.Lmkg = material.Smkg.toLong()
+////        }
+//                for (transport in material.transports) {
+//                    if (transport.deleted ==1) {
+//                        material.transports.remove(transport)
+//                    }
+//                    else if(transport.type !in mTransport){
+//                        allValid = false
+//                        val context = LocalContext.current
+//                        Toast.makeText(context, "Please select a transport type in the database", Toast.LENGTH_SHORT).show()
+//
+//                    }
+//                    else if(transport.Sdistance.toLongOrNull() == null) {
+//                        allValid = false
+//                        val context = LocalContext.current
+//                        Toast.makeText(context, "Distances must be numbers", Toast.LENGTH_SHORT).show()
+//
+//                    } else if(transport.Sdistance.toLongOrNull() != null) {
+//                        transport.Ldistance = transport.Sdistance.toLong()
+//                    }
+//                }
+//            }
+
         }
     }
 }
@@ -113,6 +157,7 @@ fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                
                 Text("Material "+materialNum+ ":", textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
 
             }
+            project.materials += materialObject(material = "",Smkg = "", Lmkg = 0, transports = mutableListOf<transportObject>(),recyclable = 0, deleted = 0)
             //Main Material Content
             Row() {
                 //MaterialDropdownMenuBox()
@@ -123,7 +168,7 @@ fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                
                 // Create a string value to store the selected city
                 var mSelectedText by remember { mutableStateOf("") }
                 var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
-
+                project.materials[materialNum].material = mSelectedText
                 // Up Icon when expanded and down icon when collapsed
                 val icon = if (mExpanded)
                     Icons.Filled.KeyboardArrowUp
@@ -138,6 +183,7 @@ fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                
                         value = mSelectedText,
                         onValueChange = { mSelectedText = it
                             mExpanded = true
+                            project.materials[materialNum].material = mSelectedText
                         },
                         modifier = Modifier
                             .width(250.dp)
@@ -167,6 +213,7 @@ fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                
                                 noMaterialFound = 1
                                 DropdownMenuItem(onClick = {
                                     mSelectedText = Material
+                                    project.materials[materialNum].material = mSelectedText
                                     mExpanded = false
                                     materialItemSelected = 1
                                 }) {
@@ -189,7 +236,10 @@ fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                
                 var cmaterialWeight by remember { mutableStateOf("")}
                 val onMaterialWeightChange = { text: String->
                     cmaterialWeight = text
+                    project.materials[materialNum].Smkg = cmaterialWeight
                 }
+                project.materials[materialNum].Smkg = cmaterialWeight
+
                 OutlinedTextField(
                     value = cmaterialWeight,
                     onValueChange = onMaterialWeightChange,
@@ -198,7 +248,7 @@ fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                
                         .padding(horizontal = 10.dp),
                     label = {Text("Material Mass / kg")}
                 )
-                project.materials += materialObject(material = mSelectedText,Smkg = cmaterialWeight, Lmkg = 0, transports = mutableListOf<transportObject>(),recyclable = 0, deleted = 0)
+                //project.materials += materialObject(material = mSelectedText,Smkg = cmaterialWeight, Lmkg = 0, transports = mutableListOf<transportObject>(),recyclable = 0, deleted = 0)
             }
             //Transport Content
             var transportAddYes by remember { mutableStateOf(-1)}
@@ -310,11 +360,12 @@ fun TransportAdd(onDeleteClicked: () -> Unit, materialNum: Int, transportNum: In
             var mExpanded by remember { mutableStateOf(false) }
             var noTransportFound: Int = 0
             var transportSelected: Int = 0
+            project.materials[materialNum].transports += transportObject(type = "", Sdistance = "", Ldistance = 0, deleted = 0)
 
             // Create a string value to store the selected city
-            var mSelectedText by remember { mutableStateOf("") }
+            var tSelectedText by remember { mutableStateOf("") }
             var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
-
+            project.materials[materialNum].transports[transportNum].type = tSelectedText
             // Up Icon when expanded and down icon when collapsed
             val icon = if (mExpanded)
                 Icons.Filled.KeyboardArrowUp
@@ -326,9 +377,10 @@ fun TransportAdd(onDeleteClicked: () -> Unit, materialNum: Int, transportNum: In
                 // Create an Outlined Text Field
                 // with icon and not expanded
                 OutlinedTextField(
-                    value = mSelectedText,
-                    onValueChange = { mSelectedText = it
+                    value = tSelectedText,
+                    onValueChange = { tSelectedText = it
                         mExpanded = true
+                        project.materials[materialNum].transports[transportNum].type = tSelectedText
                     },
                     modifier = Modifier
                         .width(250.dp)
@@ -354,10 +406,11 @@ fun TransportAdd(onDeleteClicked: () -> Unit, materialNum: Int, transportNum: In
                         .width(with(LocalDensity.current){mTextFieldSize.width.toDp()})
                 ) {
                     for (Transport in mTransport) {
-                        if (mSelectedText.uppercase() in Transport.uppercase()) {
+                        if (tSelectedText.uppercase() in Transport.uppercase()) {
                             noTransportFound = 1
                             DropdownMenuItem(onClick = {
-                                mSelectedText = Transport
+                                tSelectedText = Transport
+                                project.materials[materialNum].transports[transportNum].type = tSelectedText
                                 mExpanded = false
                                 transportSelected = 1
                             }) {
@@ -376,8 +429,11 @@ fun TransportAdd(onDeleteClicked: () -> Unit, materialNum: Int, transportNum: In
                 }
             }
             var transportDistance by remember { mutableStateOf("")}
+            project.materials[materialNum].transports[transportNum].Sdistance = transportDistance
+
             val onMaterialWeightChange = { text: String->
                 transportDistance = text
+                project.materials[materialNum].transports[transportNum].Sdistance = transportDistance
             }
             OutlinedTextField(
                 value = transportDistance,
@@ -390,7 +446,7 @@ fun TransportAdd(onDeleteClicked: () -> Unit, materialNum: Int, transportNum: In
             IconButton(onClick = onDeleteClicked) {
                 Icon(Icons.Default.Delete, contentDescription = "Localized description")
             }
-            project.materials[materialNum].transports += transportObject(type = mSelectedText, Sdistance = transportDistance, Ldistance = 0, deleted = 0)
+            //project.materials[materialNum].transports += transportObject(type = tSelectedText, Sdistance = transportDistance, Ldistance = 0, deleted = 0)
         }
         Spacer(modifier = Modifier.padding(2.5.dp))
     }
@@ -485,37 +541,85 @@ fun Validation(navController: NavHostController) {
     for (material in project.materials) {
         if (material.deleted ==1) {
             project.materials.remove(material)
+            return
         }
-        else if(material.material !in mMaterials){
+        if (material.material == "") {
+            allValid = false
+            val context = LocalContext.current
+            Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+        }
+        if (material.Smkg == "") {
+            allValid = false
+            val context = LocalContext.current
+            Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+        }
+        //var context = LocalContext.current
+        //Toast.makeText(context, ":" +material.material, Toast.LENGTH_SHORT).show()
+//        var matInList = material.material in mMaterials
+//        var matNum = 1
+//        if (matInList) {
+//            matNum = 0
+//        }
+//        context = LocalContext.current
+//        Toast.makeText(context, matNum, Toast.LENGTH_SHORT).show()
+
+        //Text("a" + material.material, textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
+        //Text(material.Smkg, textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
+        var matIn = 0
+        for ( i in mMaterials) {
+            if (material.material == i) {
+                matIn = 1
+            }
+        }
+        if(matIn == 0){
             allValid = false
             val context = LocalContext.current
             Toast.makeText(context, "Please select a material in the database", Toast.LENGTH_SHORT).show()
-            return
+            //return
         }
-        else if(material.Smkg.toLongOrNull() == null) {
+        if(material.Smkg.toLongOrNull() == null) {
             allValid = false
             val context = LocalContext.current
             Toast.makeText(context, "Material Weights must be numbers", Toast.LENGTH_SHORT).show()
-            return
-        } else if(material.Smkg.toLongOrNull() != null) {
+            //return
+        }
+        if(material.Smkg.toLongOrNull() != null) {
             material.Lmkg = material.Smkg.toLong()
         }
         for (transport in material.transports) {
             if (transport.deleted ==1) {
                 material.transports.remove(transport)
+                return
             }
-            else if(transport.type !in mTransport){
+            if (transport.type == "") {
+                allValid = false
+                val context = LocalContext.current
+                Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+            }
+            if (transport.Sdistance == "") {
+                allValid = false
+                val context = LocalContext.current
+                Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+            }
+            var tranIn = 0
+            for(i in mTransport) {
+                if(transport.type == i) {
+                    tranIn = 1
+                }
+            }
+            if(tranIn == 0){
                 allValid = false
                 val context = LocalContext.current
                 Toast.makeText(context, "Please select a transport type in the database", Toast.LENGTH_SHORT).show()
-                return
+                //return
             }
-            else if(transport.Sdistance.toLongOrNull() == null) {
+            if(transport.Sdistance.toLongOrNull() == null) {
                 allValid = false
                 val context = LocalContext.current
                 Toast.makeText(context, "Distances must be numbers", Toast.LENGTH_SHORT).show()
-                return
-            } else if(transport.Sdistance.toLongOrNull() != null) {
+                //return
+            }
+            if(transport.Sdistance.toLongOrNull() != null) {
                 transport.Ldistance = transport.Sdistance.toLong()
             }
         }
@@ -526,4 +630,5 @@ fun Validation(navController: NavHostController) {
     else {
         return
     }
+    //return
 }
