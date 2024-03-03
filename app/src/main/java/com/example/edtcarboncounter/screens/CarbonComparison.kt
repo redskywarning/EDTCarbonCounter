@@ -5,7 +5,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -45,9 +44,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.window.PopupProperties
 import androidx.navigation.NavHostController
+import com.example.edtcarboncounter.data.project
 
-val lMaterials = listOf("Delhi", "Mumbai", "Chennai", "Kolkata", "Hyderabad", "Bengaluru", "Pune")
-val lTransport = listOf("Delhi", "Mumbai", "Chennai", "Kolkata", "Hyderabad", "Bengaluru", "Pune")
 
 
 @Composable
@@ -79,12 +77,36 @@ fun CarbonComparison(navController: NavHostController) {
             ) {
                 Text(text = "Add Comparison")
             }
+//            Surface() {
+//                for (comparison in 1..comparisonAddYes) {
+//                    comparisonCard(onDeleteClicked = {}, comparisonNum = comparison)
+//                }
+//            }
+//            Spacer(modifier = Modifier.padding(20.dp))
             Surface() {
-                for (comparison in 1..comparisonAddYes) {
-                    comparisonCard(onDeleteClicked = {}, comparisonNum = comparison)
+                var showCard by remember {mutableStateOf( true)}
+                if(showCard) {
+                    comparisonCard(onDeleteClicked = { showCard = false }, comparisonNum = 0)
+                }
+                else {
+                    Card () {
+
+                    }
+                    project.materials[0].deleted = 1
+
                 }
             }
-            Spacer(modifier = Modifier.padding(20.dp))
+            for (comparison in 1..comparisonAddYes) {
+                var showCard1 by remember {mutableStateOf( true)}
+                if(showCard1) {
+                    comparisonCard(onDeleteClicked = { showCard1 = false }, comparisonNum = comparison)
+                }
+                else {
+                    Card () {
+                    }
+                    project.materials[comparison].deleted = 1
+                }
+            }
         }
     }
 }
@@ -97,8 +119,8 @@ fun comparisonCard(onDeleteClicked: () -> Unit, comparisonNum: Int) {
             .padding(all = 20.dp)
             .border(border = BorderStroke(1.dp, Color.Black))
     ) {
-        Column {
-            Row() {
+        Row {
+            Column() {
                 IconButton(onClick = onDeleteClicked) {
                     Icon(Icons.Default.Delete, contentDescription = "Localized description")
                 }
@@ -108,10 +130,11 @@ fun comparisonCard(onDeleteClicked: () -> Unit, comparisonNum: Int) {
                     fontSize = 15.sp,
                     modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp)
                 )
+                MaterialDropdownMenu("Material 1")
             }
-            MaterialDropdownMenu("Material 1")
-        Column {
-            Row() {
+
+
+            Column {
                 IconButton(onClick = onDeleteClicked) {
                     Icon(Icons.Default.Delete, contentDescription = "Localized description")
                 }
@@ -121,19 +144,23 @@ fun comparisonCard(onDeleteClicked: () -> Unit, comparisonNum: Int) {
                     fontSize = 15.sp,
                     modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp)
                 )
+                MaterialDropdownMenu("Material 2")
             }
-            MaterialDropdownMenu("Material 2")
+
         }
-            Button(
-                onClick = { /* Calculate functionality */ },
-                modifier = Modifier.padding(horizontal = 10.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff2EC4B6))
-            ) {
-                Text(text = "Calculate")
-                //Then click calculate, somehow get data from the database and calculate cabron saved - taking away some stuff?
-            }
+
+
+        Button(
+            onClick = { /* Calculate functionality */ },
+            modifier = Modifier.padding(horizontal = 10.dp),
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff2EC4B6))
+        ) {
+            Text(text = "Calculate")
+            //Then click calculate, somehow get data from the database and calculate cabron saved - taking away some stuff?
         }
     }
+
+
 }
 
 @Composable
