@@ -48,8 +48,12 @@ import com.example.edtcarboncounter.data.project
 
 
 
+
 @Composable
 fun CarbonComparison(navController: NavHostController) {
+    var selectedMaterial1 by remember { mutableStateOf("") }
+    var selectedMaterial2 by remember { mutableStateOf("") }
+
     Scaffold(
         topBar = { topBar(navController = navController) },
         bottomBar = { BottomBar(navController = navController) },
@@ -66,7 +70,9 @@ fun CarbonComparison(navController: NavHostController) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             Text(
                 "Materials", fontSize = 40.sp,
-                modifier = Modifier.padding(top = 20.dp).align(Alignment.CenterHorizontally)
+                modifier = Modifier
+                    .padding(top = 20.dp)
+                    .align(Alignment.CenterHorizontally)
             )
             var comparisonNum by remember { mutableStateOf(0) }
             var comparisonAddYes by remember { mutableStateOf(0) }
@@ -86,7 +92,12 @@ fun CarbonComparison(navController: NavHostController) {
             Surface() {
                 var showCard by remember {mutableStateOf( true)}
                 if(showCard) {
-                    comparisonCard(onDeleteClicked = { showCard = false }, comparisonNum = 0)
+                    comparisonCard(
+                        onDeleteClicked = { showCard = false },
+                        comparisonNum = 0,
+                        selectedMaterial1 = selectedMaterial1,
+                        selectedMaterial2 = selectedMaterial2
+                    )
                 }
                 else {
                     Card () {
@@ -99,7 +110,12 @@ fun CarbonComparison(navController: NavHostController) {
             for (comparison in 1..comparisonAddYes) {
                 var showCard1 by remember {mutableStateOf( true)}
                 if(showCard1) {
-                    comparisonCard(onDeleteClicked = { showCard1 = false }, comparisonNum = comparison)
+                    comparisonCard(
+                        onDeleteClicked = { showCard1 = false },
+                        comparisonNum = comparison,
+                        selectedMaterial1 = selectedMaterial1,
+                        selectedMaterial2 = selectedMaterial2
+                    )
                 }
                 else {
                     Card () {
@@ -107,12 +123,32 @@ fun CarbonComparison(navController: NavHostController) {
                     project.materials[comparison].deleted = 1
                 }
             }
+
         }
     }
 }
 
 @Composable
-fun comparisonCard(onDeleteClicked: () -> Unit, comparisonNum: Int) {
+fun comparisonCard(
+    onDeleteClicked: () -> Unit,
+    comparisonNum: Int,
+    selectedMaterial1: String,
+    selectedMaterial2: String
+) {
+    val values = listOf("30", "45", "23", "76", "15", "40", "60")
+
+    // Retrieve index of selected materials in the list
+    val index1 = values.indexOfFirst { it == selectedMaterial1 }
+    val index2 = values.indexOfFirst { it == selectedMaterial2 }
+
+    // Calculate percentage difference
+    var percentageDifference = if (index1 != -1 && index2 != -1) {
+        val value1 = values[index1].toInt()
+        val value2 = values[index2].toInt()
+        (value2 - value1).toDouble() / value1 * 100
+    } else {
+        null // Handle case when selected materials are not found in the list
+    }
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -151,12 +187,35 @@ fun comparisonCard(onDeleteClicked: () -> Unit, comparisonNum: Int) {
 
 
         Button(
-            onClick = { /* Calculate functionality */ },
-            modifier = Modifier.padding(horizontal = 10.dp),
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff2EC4B6))
+            onClick = {
+                // Calculate percentage difference when the button is clicked
+                val index1 = values.indexOfFirst { it == selectedMaterial1 }
+                val index2 = values.indexOfFirst { it == selectedMaterial2 }
+                if (index1 != -1 && index2 != -1) {
+                    val value1 = values[index1].toInt()
+                    val value2 = values[index2].toInt()
+                    percentageDifference = (value2 - value1).toDouble() / value1 * 100
+                }
+            },
         ) {
             Text(text = "Calculate")
             //Then click calculate, somehow get data from the database and calculate cabron saved - taking away some stuff?
+        }
+        percentageDifference?.let { difference ->
+           Card {
+
+
+               Row(Modifier.padding(10.dp)) {
+
+                   Text(
+                       "Percentage Difference: ${String.format("%.2f", percentageDifference)}%",
+                       textAlign = TextAlign.Left,
+                       fontSize = 15.sp,
+                       modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp)
+                   )
+
+               }
+           }
         }
     }
 
