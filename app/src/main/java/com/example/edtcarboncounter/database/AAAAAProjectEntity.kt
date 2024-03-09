@@ -22,6 +22,14 @@ data class ProjectEntity(
 )
 
 @Entity
+data class TransportEntity(
+    @PrimaryKey(autoGenerate = true)
+    val transportId: Long = 0,
+    val transportName: String,
+    val carbonPerKm: Long
+)
+
+@Entity
 data class ProjectMaterial(
     val projectId: Long,
     val materialId: Long,
