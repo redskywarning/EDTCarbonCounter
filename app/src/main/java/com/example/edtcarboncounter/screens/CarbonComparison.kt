@@ -1,5 +1,6 @@
 package com.example.edtcarboncounter.screens
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -45,6 +46,7 @@ import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.window.PopupProperties
 import androidx.navigation.NavHostController
 import com.example.edtcarboncounter.data.project
+
 
 
 
@@ -96,7 +98,10 @@ fun CarbonComparison(navController: NavHostController) {
                         onDeleteClicked = { showCard = false },
                         comparisonNum = 0,
                         selectedMaterial1 = selectedMaterial1,
-                        selectedMaterial2 = selectedMaterial2
+                        selectedMaterial2 = selectedMaterial2,
+                        // Pass the callback functions to comparisonCard
+                        onMaterial1Selected = { material -> selectedMaterial1 = material },
+                        onMaterial2Selected = { material -> selectedMaterial2 = material }
                     )
                 }
                 else {
@@ -110,120 +115,29 @@ fun CarbonComparison(navController: NavHostController) {
             for (comparison in 1..comparisonAddYes) {
                 var showCard1 by remember {mutableStateOf( true)}
                 if(showCard1) {
-                    comparisonCard(
-                        onDeleteClicked = { showCard1 = false },
-                        comparisonNum = comparison,
-                        selectedMaterial1 = selectedMaterial1,
-                        selectedMaterial2 = selectedMaterial2
-                    )
+                    comparisonCard(onDeleteClicked = { showCard1 = false }, comparisonNum = comparison, selectedMaterial1 = selectedMaterial1,
+                        selectedMaterial2 = selectedMaterial2,
+                        // Pass the callback functions to comparisonCard
+                        onMaterial1Selected = { material -> selectedMaterial1 = material },
+                        onMaterial2Selected = { material -> selectedMaterial2 = material })
+
+
                 }
                 else {
                     Card () {
                     }
                     project.materials[comparison].deleted = 1
                 }
+
+
             }
 
         }
     }
 }
-
 @Composable
-fun comparisonCard(
-    onDeleteClicked: () -> Unit,
-    comparisonNum: Int,
-    selectedMaterial1: String,
-    selectedMaterial2: String
-) {
-    val values = listOf("30", "45", "23", "76", "15", "40", "60")
-
-    // Retrieve index of selected materials in the list
-    val index1 = values.indexOfFirst { it == selectedMaterial1 }
-    val index2 = values.indexOfFirst { it == selectedMaterial2 }
-
-    // Calculate percentage difference
-    var percentageDifference = if (index1 != -1 && index2 != -1) {
-        val value1 = values[index1].toInt()
-        val value2 = values[index2].toInt()
-        (value2 - value1).toDouble() / value1 * 100
-    } else {
-        null // Handle case when selected materials are not found in the list
-    }
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(all = 20.dp)
-            .border(border = BorderStroke(1.dp, Color.Black))
-    ) {
-        Row {
-            Column() {
-                IconButton(onClick = onDeleteClicked) {
-                    Icon(Icons.Default.Delete, contentDescription = "Localized description")
-                }
-                Text(
-                    "Comparison $comparisonNum:",
-                    textAlign = TextAlign.Left,
-                    fontSize = 15.sp,
-                    modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp)
-                )
-                MaterialDropdownMenu("Material 1")
-            }
-
-
-            Column {
-                IconButton(onClick = onDeleteClicked) {
-                    Icon(Icons.Default.Delete, contentDescription = "Localized description")
-                }
-                Text(
-                    "Comparison $comparisonNum:",
-                    textAlign = TextAlign.Left,
-                    fontSize = 15.sp,
-                    modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp)
-                )
-                MaterialDropdownMenu("Material 2")
-            }
-
-        }
-
-
-        Button(
-            onClick = {
-                // Calculate percentage difference when the button is clicked
-                val index1 = values.indexOfFirst { it == selectedMaterial1 }
-                val index2 = values.indexOfFirst { it == selectedMaterial2 }
-                if (index1 != -1 && index2 != -1) {
-                    val value1 = values[index1].toInt()
-                    val value2 = values[index2].toInt()
-                    percentageDifference = (value2 - value1).toDouble() / value1 * 100
-                }
-            },
-        ) {
-            Text(text = "Calculate")
-            //Then click calculate, somehow get data from the database and calculate cabron saved - taking away some stuff?
-        }
-        percentageDifference?.let { difference ->
-           Card {
-
-
-               Row(Modifier.padding(10.dp)) {
-
-                   Text(
-                       "Percentage Difference: ${String.format("%.2f", percentageDifference)}%",
-                       textAlign = TextAlign.Left,
-                       fontSize = 15.sp,
-                       modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp)
-                   )
-
-               }
-           }
-        }
-    }
-
-
-}
-
-@Composable
-fun MaterialDropdownMenu(label: String) {
+fun MaterialDropdownMenu(label: String,onMaterial1Selected: (String) -> Unit, // Callback function for Material 1
+                         onMaterial2Selected: (String) -> Unit) {
     var mExpanded by remember { mutableStateOf(false) }
     var noMaterialFound: Int = 0
     var materialItemSelected: Int = 0
@@ -266,9 +180,15 @@ fun MaterialDropdownMenu(label: String) {
                     noMaterialFound = 1
                     DropdownMenuItem(onClick = {
 
-                    mSelectedText = material
+                        mSelectedText = material
                         mExpanded = false
                         materialItemSelected = 1
+                        if (label == "Material 1") {
+                            onMaterial1Selected(material)
+                        } else {
+                            onMaterial2Selected(material)
+                        }
+
                     }) {
                         Text(text = material)
                     }
@@ -287,6 +207,105 @@ fun MaterialDropdownMenu(label: String) {
         }
     }
 }
+
+
+@Composable
+fun comparisonCard(
+    onDeleteClicked: () -> Unit,
+    comparisonNum: Int,
+    selectedMaterial1: String,
+    selectedMaterial2: String,
+    onMaterial1Selected: (String) -> Unit, // Callback function for Material 1
+    onMaterial2Selected: (String) -> Unit
+) {
+    val values = listOf(30, 45, 50, 76, 80, 20, 40)
+
+    // State variable to store percentage difference
+    var percentageDifference by remember { mutableStateOf<Double?>(null) }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(all = 20.dp)
+            .border(border = BorderStroke(1.dp, Color.Black))
+    ) {
+        Column {
+            Row {
+                // Dropdown menus for selecting materials
+                Column {
+                    IconButton(onClick = onDeleteClicked) {
+                        Icon(Icons.Default.Delete, contentDescription = "Localized description")
+                    }
+                    Text(
+                        "Comparison $comparisonNum:",
+                        textAlign = TextAlign.Left,
+                        fontSize = 15.sp,
+                        modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp)
+                    )
+                    MaterialDropdownMenu("Material 1",onMaterial1Selected,onMaterial2Selected)
+                }
+
+                Column {
+                    IconButton(onClick = onDeleteClicked) {
+                        Icon(Icons.Default.Delete, contentDescription = "Localized description")
+                    }
+                    Text(
+                        "Comparison $comparisonNum:",
+                        textAlign = TextAlign.Left,
+                        fontSize = 15.sp,
+                        modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp)
+                    )
+                    MaterialDropdownMenu("Material 2",onMaterial1Selected, onMaterial2Selected)
+                }
+            }
+
+            // Button to calculate percentage difference
+            Button(
+
+                onClick = {
+                    // Calculate index of selectedMaterial1 and selectedMaterial2 in the values list
+                    val index1 = mMaterials.indexOf(selectedMaterial1)
+                    val index2 = mMaterials.indexOf(selectedMaterial2)
+                    Log.d("SelectedMaterials", "Material1: $selectedMaterial1, Material2: $selectedMaterial2")
+// Check if both materials are found in the mMaterials list
+                    if (index1 != -1 || index2 != -1) {
+                        // Retrieve the corresponding numbers from the values list
+                        val value1 = values[index1].toDouble()
+                        val value2 = values[index2].toDouble()
+
+                        // Calculate percentage difference
+                        percentageDifference = (value2 - value1) / value1 * 100
+
+                    }
+
+
+                },
+
+
+                modifier = Modifier.padding(top = 10.dp)
+            )
+
+            {
+                Text(text = "Calculate")
+            }
+            Row{
+                Text(
+                    "Percentage Difference: %.2f%%".format(percentageDifference ),
+                    textAlign = TextAlign.Left,
+                    fontSize = 15.sp,
+                    modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp)
+                )
+            }
+
+            // Display percentage difference if calculated
+
+
+
+        }
+    }
+}
+
+
 
 
 
