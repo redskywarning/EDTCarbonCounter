@@ -71,7 +71,7 @@ fun CarbonComparison(navController: NavHostController) {
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             Text(
-                "Materials", fontSize = 40.sp,
+                "Material Comparison", fontSize = 40.sp,
                 modifier = Modifier
                     .padding(top = 20.dp)
                     .align(Alignment.CenterHorizontally)
@@ -290,7 +290,7 @@ fun comparisonCard(
             }
             Row{
                 Text(
-                    "Percentage Difference: %.2f%%".format(percentageDifference ),
+                    " Carbon Percentage Difference: %.2f%%".format(percentageDifference ),
                     textAlign = TextAlign.Left,
                     fontSize = 15.sp,
                     modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp)
