@@ -290,7 +290,7 @@ fun comparisonCard(
             }
             Row{
                 Text(
-                    " Carbon Percentage Difference: %.2f%%".format(percentageDifference ),
+                    "Percentage Difference: %.2f%%".format(percentageDifference ),
                     textAlign = TextAlign.Left,
                     fontSize = 15.sp,
                     modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp)

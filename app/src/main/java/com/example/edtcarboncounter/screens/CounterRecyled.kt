@@ -29,14 +29,18 @@ import com.example.edtcarboncounter.data.materialObject
 import com.example.edtcarboncounter.data.project
 import com.example.edtcarboncounter.data.transportObject
 
-val rMaterials = listOf("Delhi", "Mumbai", "Chennai", "Kolkata", "Hyderabad", "Bengaluru", "Pune", "1")
+//List of Materials for iteration and selection -> Will be replaced by using data from database
+
+val rMaterials = listOf("Steel", "Aluminium", "Concrete", "Iron" )
 
 
 @Composable
 fun CounterRecycled(navController: NavHostController) {
+    //Sets up Layout of Page
     Scaffold(topBar = {topBar(navController =navController) },
         bottomBar = {BottomBar(navController=navController)},
         floatingActionButton = {
+            //Takes to next page + calls validation
             var nextPage by remember {mutableStateOf(false)}
             FloatingActionButton(onClick = {nextPage = true}) {
                 Icon(Icons.Default.ArrowForward, contentDescription = "Add")
@@ -53,11 +57,13 @@ fun CounterRecycled(navController: NavHostController) {
                 "Recycled Materials", fontSize = 40.sp, modifier = Modifier.padding(top = 20.dp).align(
                     Alignment.CenterHorizontally)
             )
+            //Add new recyclable material
             var materialNum by remember { mutableStateOf(0) }
             var materialAddYes by remember { mutableStateOf(0) }
             Button(onClick = {materialAddYes += 1; materialNum += 1}, modifier = Modifier.padding(horizontal = 10.dp),colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff2EC4B6))) {
                 Text(text = "Add Recycled Material")
             }
+            // Sets up with one material on page already --> also allows card to be deleted
             Surface() {
                 var showCard by remember { mutableStateOf( true) }
                 if(showCard) {
@@ -71,6 +77,7 @@ fun CounterRecycled(navController: NavHostController) {
 
                 }
             }
+            // for each time button pressed, adds material card
             for (material in 1..materialAddYes) {
                 var showCard1 by remember { mutableStateOf( true) }
                 if(showCard1) {
@@ -89,7 +96,7 @@ fun CounterRecycled(navController: NavHostController) {
     }
 }
 
-
+// Card function
 @Composable
 fun rmaterialCards(onDeleteClicked: () -> Unit, materialNum: Int)                                                                                                                                                                                                                                                                                                              {
 
@@ -108,6 +115,7 @@ fun rmaterialCards(onDeleteClicked: () -> Unit, materialNum: Int)               
                 Text("Recycled Material:", textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
 
             }
+            //Sets up material object to be edited
             project.recyclableMats += materialObject(material = "",Smkg = "", Lmkg = 0, transports = mutableListOf<transportObject>(),recyclable = 1, deleted = 0)
             //Main Material Content
             Row() {
@@ -115,8 +123,6 @@ fun rmaterialCards(onDeleteClicked: () -> Unit, materialNum: Int)               
                 var mExpanded by remember { mutableStateOf(false) }
                 var noMaterialFound: Int = 0
                 var materialItemSelected: Int = 0
-                // Create a list of cities
-                // Create a string value to store the selected city
                 var mSelectedText by remember { mutableStateOf("") }
                 var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
                 project.recyclableMats[materialNum].material = mSelectedText
@@ -128,8 +134,7 @@ fun rmaterialCards(onDeleteClicked: () -> Unit, materialNum: Int)               
 
                 Column(Modifier.padding(horizontal = 10.dp)) {
 
-                    // Create an Outlined Text Field
-                    // with icon and not expanded
+                    // Create an Outlined Text Field with icon and not expanded
                     OutlinedTextField(
                         value = mSelectedText,
                         onValueChange = { mSelectedText = it
@@ -139,8 +144,7 @@ fun rmaterialCards(onDeleteClicked: () -> Unit, materialNum: Int)               
                         modifier = Modifier
                             .width(250.dp)
                             .onGloballyPositioned { coordinates ->
-                                // This value is used to assign to
-                                // the DropDown the same width
+                                // This value is used to assign the DropDown the same width
                                 mTextFieldSize = coordinates.size.toSize()
                             },
                         label = {Text("Material (Source)")},
@@ -150,8 +154,7 @@ fun rmaterialCards(onDeleteClicked: () -> Unit, materialNum: Int)               
                         }
                     )
 
-                    // Create a drop-down menu with list of cities,
-                    // when clicked, set the Text Field text as the city selected
+                    // Dropdown menu created
                     DropdownMenu(
                         expanded = mExpanded,
                         onDismissRequest = { mExpanded = false },
@@ -175,8 +178,6 @@ fun rmaterialCards(onDeleteClicked: () -> Unit, materialNum: Int)               
                         if(noMaterialFound == 0) {
                             //Add in option to add to database
                             DropdownMenuItem(onClick = {
-                                /*TODO*/
-                                //HELP KATIE
                                 //Call function to create pop up to add to database
                             }) {
                                 Text(text = "Add to Database")
@@ -184,13 +185,14 @@ fun rmaterialCards(onDeleteClicked: () -> Unit, materialNum: Int)               
                         }
                     }
                 }
+                // Adds data to material data
                 var cmaterialWeight by remember { mutableStateOf("")}
                 val onMaterialWeightChange = { text: String->
                     cmaterialWeight = text
                     project.recyclableMats[materialNum].Smkg = cmaterialWeight
                 }
                 project.recyclableMats[materialNum].Smkg = cmaterialWeight
-
+                // Weight input
                 OutlinedTextField(
                     value = cmaterialWeight,
                     onValueChange = onMaterialWeightChange,
@@ -206,7 +208,7 @@ fun rmaterialCards(onDeleteClicked: () -> Unit, materialNum: Int)               
             Button(onClick = {transportAddYes += 1}, modifier = Modifier.padding(horizontal = 10.dp),colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff2EC4B6))) {
                 Text(text = "Add transport")
             }
-
+            // Same as for material -> allows transport to be deleted
             for (transport in 0..transportAddYes) {
                 var showCardt by remember {mutableStateOf( true)}
                 if(showCardt) {
@@ -225,12 +227,12 @@ fun rmaterialCards(onDeleteClicked: () -> Unit, materialNum: Int)               
     }
 }
 
-
+// Function for transport content
 @Composable
 fun rTransportAdd(onDeleteClicked: () -> Unit, materialNum: Int, transportNum: Int) {
 
     Card () {
-
+        //Dropdown menu code - same as for materials
         Spacer(modifier = Modifier.padding(2.5.dp))
         Row() {
             var mExpanded by remember { mutableStateOf(false) }
@@ -238,7 +240,6 @@ fun rTransportAdd(onDeleteClicked: () -> Unit, materialNum: Int, transportNum: I
             var transportSelected: Int = 0
             project.recyclableMats[materialNum].transports += transportObject(type = "", Sdistance = "", Ldistance = 0, deleted = 0)
 
-            // Create a string value to store the selected city
             var tSelectedText by remember { mutableStateOf("") }
             var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
             project.recyclableMats[materialNum].transports[transportNum].type = tSelectedText
@@ -250,8 +251,7 @@ fun rTransportAdd(onDeleteClicked: () -> Unit, materialNum: Int, transportNum: I
 
             Column(Modifier.padding(horizontal = 10.dp)) {
 
-                // Create an Outlined Text Field
-                // with icon and not expanded
+                // Create an Outlined Text Field with icon and not expanded
                 OutlinedTextField(
                     value = tSelectedText,
                     onValueChange = { tSelectedText = it
@@ -261,8 +261,7 @@ fun rTransportAdd(onDeleteClicked: () -> Unit, materialNum: Int, transportNum: I
                     modifier = Modifier
                         .width(250.dp)
                         .onGloballyPositioned { coordinates ->
-                            // This value is used to assign to
-                            // the DropDown the same width
+                            // This value is used to assign the DropDown the same width
                             mTextFieldSize = coordinates.size.toSize()
                         },
                     label = {Text("Transport")},
@@ -329,6 +328,7 @@ fun rTransportAdd(onDeleteClicked: () -> Unit, materialNum: Int, transportNum: I
 }
 
 
+// Validation function that checks all data inputted is in correct form
 @Composable
 fun rValidation(navController: NavHostController) {
     var allValid = true

@@ -35,9 +35,7 @@ fun CounterReceipt(navController: NavHostController) {
             Box (modifier = Modifier
                 .padding(horizontal = 30.dp)
                 .fillMaxWidth()
-                    //HELP - Katie this is where to call function to download the database etc
-                    //You probably also want it to automatically take you back to the home page + I might need it to reset something for}
-                    //me in terms of validation so yay!!
+                    // Where to add function to save the database and download excel file
                 .clickable(onClick = {/*TODO*/ })
                 .background(Color.LightGray)
                 .height(100.dp),
@@ -50,8 +48,5 @@ fun CounterReceipt(navController: NavHostController) {
 
     }
 
-    @Composable
-    fun resetProjectObject() {
-
-    }
 }
+

@@ -33,6 +33,7 @@ fun Home(navController: NavHostController) {
             .background(Color.White)
             .fillMaxSize()) {}
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            // Creates Menu
             Text(
                 text = "Carbon Counter",
                 textAlign = TextAlign.Center,

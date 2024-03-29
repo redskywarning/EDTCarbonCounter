@@ -34,6 +34,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+// Sets up navigation between screens and sets Home page as first page
 @Composable
 fun MainScreen() {
     val navController=rememberNavController()

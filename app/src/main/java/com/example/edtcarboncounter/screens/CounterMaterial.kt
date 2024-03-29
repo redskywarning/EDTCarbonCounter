@@ -39,17 +39,22 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import java.util.Collections.emptyList
 
-val mMaterials = listOf("Delhi", "Mumbai", "Chennai", "Kolkata", "Hyderabad", "Bengaluru", "Pune", "1")
-val mTransport = listOf("Delhi", "Mumbai", "Chennai", "Kolkata", "Hyderabad", "Bengaluru", "Pune")
+//List of Materials/Transport for iteration and selection -> Will be replaced by using data from database
 
+val mMaterials = listOf("Steel", "Aluminium", "Concrete", "Iron" )
+val mTransport = listOf("Car", "Lorry", "Boat", "Plane ", "Train")
+
+//Main Function
 @Composable
 fun CounterMaterial(navController: NavHostController) {
+    // Sets up layout of Page
     Scaffold(topBar = {topBar(navController =navController) },
         bottomBar = {BottomBar(navController=navController)},
         floatingActionButton = {
+            //Button takes to next page -> calls validation to check all fields are filled in correctly
             var nextPage by remember {mutableStateOf(false)}
             FloatingActionButton(onClick = {nextPage = true}) {
-                Icon(Icons.Default.ArrowForward, contentDescription = "Add")
+                Icon(Icons.Default.ArrowForward, contentDescription = "Forwards")
             }
             if(nextPage) {
                 Validation(navController = navController)
@@ -62,11 +67,13 @@ fun CounterMaterial(navController: NavHostController) {
             Text(
                 "Materials", fontSize = 40.sp, modifier = Modifier.padding(top = 20.dp).align(Alignment.CenterHorizontally)
             )
+            // Allows more materials to be added
             var materialNum by remember {mutableStateOf(0)}
             var materialAddYes by remember { mutableStateOf(0)}
             Button(onClick = {materialAddYes += 1; materialNum += 1}, modifier = Modifier.padding(horizontal = 10.dp),colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff2EC4B6))) {
                 Text(text = "Add Material")
             }
+            // Creates starter material card on screen + allows it to be deleted
             Surface() {
                 var showCard by remember {mutableStateOf( true)}
                 if(showCard) {
@@ -80,6 +87,7 @@ fun CounterMaterial(navController: NavHostController) {
 
                 }
             }
+            // Adds more material cards for every time the button is clicked until they are deleted/user moves on
             for (material in 1..materialAddYes) {
                 var showCard1 by remember {mutableStateOf( true)}
                 if(showCard1) {
@@ -96,6 +104,7 @@ fun CounterMaterial(navController: NavHostController) {
     }
 }
 
+// Function for Material Content
 @Composable
 fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                                                                                                                                                                                                                                                                                                              {
 
@@ -115,14 +124,13 @@ fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                
 
             }
             project.materials += materialObject(material = "",Smkg = "", Lmkg = 0, transports = mutableListOf<transportObject>(),recyclable = 0, deleted = 0)
-            //Main Material Content
+            //Main Material Content - Dropdown menu
             Row() {
                 //MaterialDropdownMenuBox()
                 var mExpanded by remember { mutableStateOf(false) }
                 var noMaterialFound: Int = 0
                 var materialItemSelected: Int = 0
                 // Create a list of cities
-                // Create a string value to store the selected city
                 var mSelectedText by remember { mutableStateOf("") }
                 var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
                 project.materials[materialNum].material = mSelectedText
@@ -145,8 +153,7 @@ fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                
                         modifier = Modifier
                             .width(250.dp)
                             .onGloballyPositioned { coordinates ->
-                                // This value is used to assign to
-                                // the DropDown the same width
+                                // This value is used to assign the DropDown the same width
                                 mTextFieldSize = coordinates.size.toSize()
                             },
                         label = {Text("Material (Source)")},
@@ -156,8 +163,6 @@ fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                
                         }
                     )
 
-                    // Create a drop-down menu with list of cities,
-                    // when clicked, set the Text Field text as the city selected
                     DropdownMenu(
                         expanded = mExpanded,
                         onDismissRequest = { mExpanded = false },
@@ -181,8 +186,6 @@ fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                
                         if(noMaterialFound == 0) {
                             //Add in option to add to database
                             DropdownMenuItem(onClick = {
-                                /*TODO*/
-                                //HELP KATIE
                                 //Call function to create pop up to add to database
                             }) {
                                 Text(text = "Add to Database")
@@ -190,6 +193,7 @@ fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                
                         }
                     }
                 }
+                // Weight content of material
                 var cmaterialWeight by remember { mutableStateOf("")}
                 val onMaterialWeightChange = { text: String->
                     cmaterialWeight = text
@@ -232,84 +236,8 @@ fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                
 }
 
 @Composable
-fun MaterialDropdownMenuBox() {
-
-    var mExpanded by remember { mutableStateOf(false) }
-    var noMaterialFound: Int = 0
-    var materialItemSelected: Int = 0
-    // Create a list of cities
-    val mMaterials = listOf("Delhi", "Mumbai", "Chennai", "Kolkata", "Hyderabad", "Bengaluru", "Pune")
-    // Create a string value to store the selected city
-    var mSelectedText by remember { mutableStateOf("") }
-    var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
-
-    // Up Icon when expanded and down icon when collapsed
-    val icon = if (mExpanded)
-        Icons.Filled.KeyboardArrowUp
-    else
-        Icons.Filled.KeyboardArrowDown
-
-    Column(Modifier.padding(horizontal = 10.dp)) {
-
-        // Create an Outlined Text Field
-        // with icon and not expanded
-        OutlinedTextField(
-            value = mSelectedText,
-            onValueChange = { mSelectedText = it
-                            mExpanded = true
-                            },
-            modifier = Modifier
-                .width(250.dp)
-                .onGloballyPositioned { coordinates ->
-                    // This value is used to assign to
-                    // the DropDown the same width
-                    mTextFieldSize = coordinates.size.toSize()
-                },
-            label = {Text("Material (Source)")},
-            trailingIcon = {
-                Icon(icon,"contentDescription",
-                    Modifier.clickable { mExpanded = !mExpanded })
-            }
-        )
-
-        // Create a drop-down menu with list of cities,
-        // when clicked, set the Text Field text as the city selected
-        DropdownMenu(
-            expanded = mExpanded,
-            onDismissRequest = { mExpanded = false },
-            properties = PopupProperties(focusable = false),
-            modifier = Modifier
-                .width(with(LocalDensity.current){mTextFieldSize.width.toDp()})
-        ) {
-            for (Material in mMaterials) {
-                if (mSelectedText.uppercase() in Material.uppercase()) {
-                    noMaterialFound = 1
-                    DropdownMenuItem(onClick = {
-                        mSelectedText = Material
-                        mExpanded = false
-                        materialItemSelected = 1
-                    }) {
-                        Text(text = Material)
-                    }
-                }
-            }
-            if(noMaterialFound == 0) {
-                //Add in option to add to database
-                DropdownMenuItem(onClick = {
-                    /*TODO*/
-                    //HELP KATIE
-                    //Call function to create pop up to add to database
-                }) {
-                    Text(text = "Add to Database")
-                }
-            }
-        }
-    }
-}
-
-@Composable
 fun TransportAdd(onDeleteClicked: () -> Unit, materialNum: Int, transportNum: Int) {
-
+    // Transport Cotent
     Card () {
 
         Spacer(modifier = Modifier.padding(2.5.dp))
@@ -319,7 +247,6 @@ fun TransportAdd(onDeleteClicked: () -> Unit, materialNum: Int, transportNum: In
             var transportSelected: Int = 0
             project.materials[materialNum].transports += transportObject(type = "", Sdistance = "", Ldistance = 0, deleted = 0)
 
-            // Create a string value to store the selected city
             var tSelectedText by remember { mutableStateOf("") }
             var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
             project.materials[materialNum].transports[transportNum].type = tSelectedText
@@ -385,6 +312,7 @@ fun TransportAdd(onDeleteClicked: () -> Unit, materialNum: Int, transportNum: In
                     }
                 }
             }
+            // Distance content
             var transportDistance by remember { mutableStateOf("")}
             project.materials[materialNum].transports[transportNum].Sdistance = transportDistance
 
@@ -408,90 +336,7 @@ fun TransportAdd(onDeleteClicked: () -> Unit, materialNum: Int, transportNum: In
         Spacer(modifier = Modifier.padding(2.5.dp))
     }
 }
-
-@Composable
-fun TransportDropdownMenuBox() {
-
-    var mExpanded by remember { mutableStateOf(false) }
-    var noTransportFound: Int = 0
-    var transportSelected: Int = 0
-
-    val mTransport = listOf("Delhi", "Mumbai", "Chennai", "Kolkata", "Hyderabad", "Bengaluru", "Pune")
-    //val mTransport = listOf<String>()
-    // Create a string value to store the selected city
-    var mSelectedText by remember { mutableStateOf("") }
-    var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
-
-    // Up Icon when expanded and down icon when collapsed
-    val icon = if (mExpanded)
-        Icons.Filled.KeyboardArrowUp
-    else
-        Icons.Filled.KeyboardArrowDown
-
-    Column(Modifier.padding(horizontal = 10.dp)) {
-
-        // Create an Outlined Text Field
-        // with icon and not expanded
-        OutlinedTextField(
-            value = mSelectedText,
-            onValueChange = { mSelectedText = it
-                mExpanded = true
-            },
-            modifier = Modifier
-                .width(250.dp)
-                .onGloballyPositioned { coordinates ->
-                    // This value is used to assign to
-                    // the DropDown the same width
-                    mTextFieldSize = coordinates.size.toSize()
-                },
-            label = {Text("Transport")},
-            trailingIcon = {
-                Icon(icon,"contentDescription",
-                    Modifier.clickable { mExpanded = !mExpanded })
-            }
-        )
-
-        // Create a drop-down menu with list of cities,
-        // when clicked, set the Text Field text as the city selected
-        DropdownMenu(
-            expanded = mExpanded,
-            onDismissRequest = { mExpanded = false },
-            properties = PopupProperties(focusable = false),
-            modifier = Modifier
-                .width(with(LocalDensity.current){mTextFieldSize.width.toDp()})
-        ) {
-            for (Transport in mTransport) {
-                if (mSelectedText.uppercase() in Transport.uppercase()) {
-                    noTransportFound = 1
-                    DropdownMenuItem(onClick = {
-                        mSelectedText = Transport
-                        mExpanded = false
-                        transportSelected = 1
-                    }) {
-                        Text(text = Transport)
-                    }
-                }
-            }
-            if(noTransportFound == 0) {
-                //Add in option to add to database
-                DropdownMenuItem(onClick = {
-                    //Call function to create pop up to add to database
-                }) {
-                    Text(text = "Add to Transport Database")
-                }
-            }
-//            mMaterials.forEach { label ->
-//                DropdownMenuItem(onClick = {
-//                    mSelectedText = label
-//                    mExpanded = false
-//                }) {
-//                    Text(text = label)
-//                }
-//            }
-        }
-    }
-}
-
+// Validation before page moves on to ensure content entered is all correct
 @Composable
 fun Validation(navController: NavHostController) {
     var allValid = true
@@ -589,3 +434,139 @@ fun Validation(navController: NavHostController) {
     }
     //return
 }
+
+//
+//@Composable
+//fun Validation(navController: NavHostController) {
+//    var allValid = true
+//    for (material in project.materials) {
+//        var valid = true
+////        if (material.deleted ==1) {
+////            project.materials.remove(material)
+////            return
+////            //continue
+////        }
+//        //empty checks
+//        if (material.material == "") {
+//            valid = false
+//            val context = LocalContext.current
+//            Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+//
+//        }
+//        if (material.Smkg == "") {
+//            valid = false
+//            val context = LocalContext.current
+//            Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+//        }
+//        //var context = LocalContext.current
+//        //Toast.makeText(context, ":" +material.material, Toast.LENGTH_SHORT).show()
+////        var matInList = material.material in mMaterials
+////        var matNum = 1
+////        if (matInList) {
+////            matNum = 0
+////        }
+////        context = LocalContext.current
+////        Toast.makeText(context, matNum, Toast.LENGTH_SHORT).show()
+//
+//        //Text("a" + material.material, textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
+//        //Text(material.Smkg, textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
+//        //check valid mat
+//        var matIn = 0
+//        for ( i in mMaterials) {
+//            if (material.material == i) {
+//                matIn = 1
+//            }
+//        }
+//        if(matIn == 0){
+//            valid = false
+//            val context = LocalContext.current
+//            Toast.makeText(context, "Please select a material in the database", Toast.LENGTH_SHORT).show()
+//            //return
+//        }
+//        //check long num weight
+//        if(material.Smkg.toLongOrNull() == null) {
+//            valid = false
+//            val context = LocalContext.current
+//            Toast.makeText(context, "Material Weights must be numbers", Toast.LENGTH_SHORT).show()
+//            //return
+//        }
+//        if(material.Smkg.toLongOrNull() != null) {
+//            material.Lmkg = material.Smkg.toLong()
+//        }
+//        //check transports
+//        for (transport in material.transports) {
+//            var validT = true
+////            if (transport.deleted ==1) {
+////                //material.transports.remove(transport)
+////                continue
+////            }
+//            if (transport.type == "") {
+//                validT = false
+//                val context = LocalContext.current
+//                Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+//            }
+//            if (transport.Sdistance == "") {
+//                validT = false
+//                val context = LocalContext.current
+//                Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+//            }
+//            var tranIn = 0
+//            for(i in mTransport) {
+//                if(transport.type == i) {
+//                    tranIn = 1
+//                }
+//            }
+//            if(tranIn == 0){
+//                validT = false
+//                val context = LocalContext.current
+//                Toast.makeText(context, "Please select a transport type in the database", Toast.LENGTH_SHORT).show()
+//                //return
+//            }
+//            if(transport.Sdistance.toLongOrNull() == null) {
+//                validT = false
+//                val context = LocalContext.current
+//                Toast.makeText(context, "Distances must be numbers", Toast.LENGTH_SHORT).show()
+//                //return
+//            }
+//            if(transport.Sdistance.toLongOrNull() != null) {
+//                transport.Ldistance = transport.Sdistance.toLong()
+//            }
+//
+//            if (transport.deleted ==1) {
+//                //material.transports.remove(transport)
+//                validT = true
+//            }
+//            if (!validT) {
+//                allValid = false
+//            }
+//        }
+////        for(transport in material.transports) {
+////            if(transport.deleted == 1){
+////                material.transports.remove(transport)
+////            }
+////        }
+//        if (material.deleted ==1) {
+//            valid = true
+//        }
+//        if(!valid) {
+//            allValid = false
+//        }
+//    }
+//    for (material in project.materials) {
+//        if (material.deleted == 1) {
+//            project.materials.remove(material)
+//        }
+//        for (transport in material.transports) {
+//            if (transport.deleted ==1) {
+//                material.transports.remove(transport)
+//            }
+//        }
+//    }
+//    if (allValid) {
+//        navController.navigate(NavRoutes.CounterRecycled.route)
+//    }
+//    else {
+//        //return
+//    }
+//    //return
+//}

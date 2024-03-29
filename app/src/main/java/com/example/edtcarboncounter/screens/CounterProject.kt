@@ -25,15 +25,8 @@ import java.util.logging.Logger.global
 fun CounterProject(navController: NavHostController) {
     Scaffold(topBar = {topBar(navController =navController) },
         bottomBar = {BottomBar(navController=navController)},
-//        floatingActionButton = {
-//            FloatingActionButton(onClick = Validate(navController = navController, projectName = projectName)) {
-//                Icon(Icons.Default.ArrowForward, contentDescription = "Add")
-//            }
-//        }
     ) {
-        //content area
-        //IM AWARE THERE IS A PROBLEM WITH FORMATTING AND CENTERING - IM NOT SURE HOW TO FIX
-        //SUGGESTIONS WELCOME
+        // Content
         Box(modifier = Modifier.fillMaxSize()) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()){
                 Text(
@@ -47,6 +40,7 @@ fun CounterProject(navController: NavHostController) {
                         .padding(top = 20.dp), textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.padding(20.dp))
+                // Text field for name entry
                 var projectName by remember { mutableStateOf("") }
                 val onprojectNameChange = { text: String->
                     projectName = text
@@ -73,6 +67,7 @@ fun CounterProject(navController: NavHostController) {
     }
 }
 
+// Ensures project name is entered and is unique to prevent errors
 @Composable
 fun Validate(navController: NavHostController, projectName: String) {
     if (projectName == "") {
@@ -87,8 +82,6 @@ fun Validate(navController: NavHostController, projectName: String) {
     else {
         project.projectName = projectName
         projectNamesList += projectName
-        //HELP
-        //KATIE THIS IS WHERE THE PROJECT NAME INPUT IS - ENJOY
         navController.navigate(NavRoutes.CounterMaterial.route)
     }
 }
