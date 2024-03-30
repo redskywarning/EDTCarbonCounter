@@ -130,7 +130,6 @@ fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                
                 var mExpanded by remember { mutableStateOf(false) }
                 var noMaterialFound: Int = 0
                 var materialItemSelected: Int = 0
-                // Create a list of cities
                 var mSelectedText by remember { mutableStateOf("") }
                 var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
                 project.materials[materialNum].material = mSelectedText
@@ -153,7 +152,6 @@ fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                
                         modifier = Modifier
                             .width(250.dp)
                             .onGloballyPositioned { coordinates ->
-                                // This value is used to assign the DropDown the same width
                                 mTextFieldSize = coordinates.size.toSize()
                             },
                         label = {Text("Material (Source)")},
