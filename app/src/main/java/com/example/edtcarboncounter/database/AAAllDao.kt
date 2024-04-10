@@ -1,14 +1,10 @@
 package com.example.edtcarboncounter.database
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
-import com.example.edtcarboncounter.database.MaterialEntity
-import com.example.edtcarboncounter.database.ProjectEntity
-import com.example.edtcarboncounter.database.ProjectWithMaterialAndCarbonCount
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -20,10 +16,24 @@ interface AAAllDao {
     suspend fun deleteMaterial(material: MaterialEntity)
 
     @Query("SELECT * FROM MaterialEntity ORDER BY materialName ASC")
-    suspend fun getMaterialsOrderedByMaterialName(): Flow<List<MaterialEntity>>
+    fun getMaterialsOrderedByMaterialName(): Flow<List<MaterialEntity>>
 
     @Query("SELECT materialName FROM MaterialEntity")
-    suspend fun getAllMaterialNames(): Flow<List<String>> //Flow<List<MaterialEntity>>
+    fun getAllMaterialNames(): Flow<List<String>> //Flow<List<MaterialEntity>>
+
+    ///////////////////////////////////////////////////////////////////////
+
+    @Upsert
+    suspend fun upsertTransport(transport: TransportEntity)
+
+    @Delete
+    suspend fun deleteTransport(transport: TransportEntity)
+
+    @Query("SELECT * FROM TransportEntity ORDER BY transportName ASC")
+    fun getTransportOrderedByTransportName(): Flow<List<TransportEntity>>
+
+    @Query("SELECT transportName FROM TransportEntity")
+    fun getAllTransportNames(): Flow<List<String>> //Flow<List<MaterialEntity>>
 
     ///////////////////////////////////////////////////////////////////////
     @Upsert
@@ -36,17 +46,33 @@ interface AAAllDao {
     fun getProjectsOrderedByProjectName(): Flow<List<ProjectEntity>>
 
     @Query("SELECT projectName FROM ProjectEntity")
-    suspend fun getAllProjectNames(): Flow<List<String>> //Flow<List<ProjectEntity>>
+    fun getAllProjectNames(): Flow<List<String>> //Flow<List<ProjectEntity>>
 
     ////////////////////////////////////////////////////////////////////////////////
+//    @Upsert
+//    suspend fun upsertProjectMaterial(project_material: ProjectMaterial)
+//
+//    @Delete
+//    suspend fun deleteProjectMaterial(project_material: ProjectMaterial)
+//
+//    @Query("SELECT * FROM ProjectEntity ORDER BY projectId ASC")
+//    fun getProjectMaterialOrderedByProjectId(): Flow<List<ProjectMaterial>> //Flow<List<ProjectEntity>>
+    ////////////////////////////////////////////////////////////////////////////////
+//    @Transaction
+//    @Query("SELECT * FROM ProjectWithMaterialAndCarbonCountAndTransport WHERE projectId = :projectName")
+//    fun getProjectWithMaterialsAndCarbonCount(projectName: String): Flow<List<ProjectWithMaterialAndCarbonCountAndTransport>>
+    ///////////////////////////////////////////////////////////////////////////////
+//    @Transaction
+//    @Query("SELECT * FROM ProjectWithMaterialWithTransport WHERE projectId = :projectName")
+//    fun getProjectWithMaterialsAndCarbonCount(projectName: String): Flow<List<ProjectWithMaterialWithTransport>>
+
     @Upsert
-    suspend fun upsertProjectMaterial(project: ProjectMaterial)
+    suspend fun upsertProjectMaterialTransport(project_material_transport: ProjectMaterialTransport)
 
     @Delete
-    suspend fun deleteProjectMaterial(project: ProjectMaterial)
-    ////////////////////////////////////////////////////////////////////////////////
+    suspend fun deleteProjectMaterialTransport(project_material_transport: ProjectMaterialTransport)
+
     @Transaction
-    @Query("SELECT * FROM ProjectEntity WHERE projectId = :projectName")
-    suspend fun getProjectWithMaterialsAndCarbonCount(projectName: String): Flow<List<ProjectWithMaterialAndCarbonCount>>
-    ///////////////////////////////////////////////////////////////////////////////
+    @Query("SELECT * FROM ProjectEntity")
+    fun getProjectMaterialTransport(): Flow<List<ProjectWithMaterialAndTransport>>
 }

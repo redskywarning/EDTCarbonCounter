@@ -3,51 +3,204 @@ package com.example.edtcarboncounter.database
 //Setting out all entities -- these are our tables that hold our data
 import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.Junction
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 
 @Entity
 data class MaterialEntity(
-    @PrimaryKey(autoGenerate = true)
-    val materialId: Long = 0,
     val materialName: String,
-    val carbonContent: Long
+    val carbonContent: Double,
+    @PrimaryKey(autoGenerate = true)
+    val materialId: Int = 0
 )
 
 @Entity
 data class ProjectEntity(
+    val projectName: String,
     @PrimaryKey(autoGenerate = true)
-    val projectId: Long = 0,
-    val projectName: String
+    val projectId: Int = 0
 )
 
 @Entity
 data class TransportEntity(
-    @PrimaryKey(autoGenerate = true)
-    val transportId: Long = 0,
     val transportName: String,
-    val carbonPerKm: Long
+    val carbonKgPerKm: Double,
+    @PrimaryKey(autoGenerate = true)
+    val transportId: Int = 0,
 )
 
-@Entity
-data class ProjectMaterial(
-    val projectId: Long,
-    val materialId: Long,
-    val kgMaterialUsed: Long
+@Entity(primaryKeys = ["projectId","materialId","transportId"])
+data class ProjectMaterialTransport(
+    val projectId: Int,
+    val materialId: Int,
+    val transportId: Int,
+    val kgMaterialUsed: Double,
+    val kmTravelled: Double
 )
 
-data class MaterialWithCarbonCount (
-    @Embedded val material: MaterialEntity,
-    val kgMaterialUsed: Long
-)
-
-
-data class ProjectWithMaterialAndCarbonCount ( //this is what we are querying for info
+data class ProjectWithMaterialAndTransport(
     @Embedded val project: ProjectEntity,
     @Relation(
-        entity = MaterialEntity::class,
         parentColumn = "projectId",
-        entityColumn = "materialId"
+        entityColumn = "materialId",
+        associateBy = Junction(ProjectMaterialTransport::class)
     )
-    val materialWithCarbonCount: List<MaterialWithCarbonCount>
+    val material: List<MaterialEntity>,
+    @Relation(
+        parentColumn = "projectId",
+        entityColumn = "transportId",
+        associateBy = Junction(ProjectMaterialTransport::class)
+    )
+    val transport: List<TransportEntity>
 )
+
+//@Entity(primaryKeys = ["materialId","transportId"])
+//data class MaterialTransport(
+//    val materialId: Int,
+//    val transportId: Int,
+//    val kgMaterialUsed: Double,
+//    val kmTravelled: Double
+//)
+
+//data class MaterialWithTransport(
+//    @Embedded val material: MaterialEntity,
+//    @Relation(
+//        parentColumn = "materialId",
+//        entityColumn = "transportId",
+//        associateBy = Junction(MaterialTransport::class)
+//    )
+//    val transport: List<TransportEntity>
+//)
+
+//data class ProjectWithMaterial(
+//    @Embedded val project: ProjectEntity,
+//    @Relation(
+//        parentColumn = "projectId",
+//        entityColumn = "materialId",
+//        associateBy = Junction(ProjectMaterial::class)
+//    )
+//    val material: List<MaterialEntity>
+//)
+
+
+//data class ProjectWithMaterialWithTransport(
+//    @Embedded val project: ProjectEntity,
+//    @Relation(
+//        entity = MaterialEntity::class,
+//        parentColumn = "projectId",
+//        entityColumn = "materialId"
+//    )
+//    val material: List<MaterialEntity>
+//)
+
+
+
+
+//@Entity
+//data class ProjectMaterialTransport(
+//    @PrimaryKey val projectId: Int,
+//    val materialId: Int,
+//    val transportId: Int,
+//    val materialUsedKg: Double,
+//    val distanceKmTravelled: Double
+//)
+
+//data class ProjectWithMaterialAndTransport(
+//    @Embedded val project: ProjectEntity,
+//    @Relation(
+//        parentColumn = "projectId",
+//        entityColumn = "materialId",
+//        associateBy = Junction(ProjectMaterialTransport::class)
+//    )
+//    val material: MaterialEntity,
+//    @Relation(
+//        parentColumn = "projectId",
+//        entityColumn = "transportId",
+//        associateBy = Junction(ProjectMaterialTransport::class)
+//    )
+//    val transportMode: TransportEntity
+//)
+
+//@Entity
+//data class ProjectMaterial(
+//    @PrimaryKey val projectId: Int,
+//    val materialId: Int,
+//    val kgMaterialUsed: Double
+//)
+
+//data class MaterialWithCarbonCount (
+//    @Embedded val material: MaterialEntity,
+//    val kgMaterialUsed: Double
+//)
+
+//@Entity(primaryKeys = ["playlistId", "songId"])
+//data class PlaylistSongCrossRef(
+//    val playlistId: Long,
+//    val songId: Long
+//)
+//
+//data class MaterialWithTransport(
+//    @Embedded val material: MaterialEntity,
+//    @Relation(
+//        parentColumn = "materialId",
+//        entityColumn = "transportId"
+//    )
+//    val transport: List<TransportEntity>,
+//    val kmTravelled: Double
+//)
+//
+//data class UserWithPlaylistsAndSongs(
+//    @Embedded val user: User
+//    @Relation(
+//entity = Playlist::class,
+//parentColumn = "userId",
+//entityColumn = "userCreatorId"
+//)
+//val playlists: List<PlaylistWithSongs>
+//)
+///**/
+
+
+//@DatabaseView("SELECT ProjectEntity.projectId AS projectId, ProjectEntity.projectName AS projectName, " +
+//        "MaterialEntity.materialId AS materialId, MaterialEntity.materialName AS materialName, " +
+//        "MaterialEntity.carbonContent AS carbonContent, ProjectMaterial.kgMaterialUsed AS kgMaterialUsed, " +
+//        "TransportEntity.transportId AS transportId, TransportEntity.transportName AS transportName, " +
+//        "TransportEntity.carbonKgPerKm AS carbonKgPerKm " +
+//        "FROM ProjectEntity " +
+//        "INNER JOIN ProjectMaterial ON ProjectEntity.projectId = ProjectMaterial.projectId " +
+//        "INNER JOIN MaterialEntity ON ProjectMaterial.materialId = MaterialEntity.materialId " +
+//        "INNER JOIN TransportEntity ON ProjectEntity.projectId = TransportEntity.transportId")
+//data class ProjectWithMaterialAndCarbonCountAndTransport(
+//    val projectId: Int,
+//    val projectName: String,
+//    val materialId: Int,
+//    val materialName: String,
+//    val carbonContent: Double,
+//    val kgMaterialUsed: Double,
+//    val transportId: Int,
+//    val transportName: String,
+//    val carbonPerKm: Double
+//)
+
+
+//data class MaterialWithCarbonCountAndTransport (
+//    @Embedded val materialWithCarbonCount: MaterialWithCarbonCount,
+//    @Relation(
+//        entity = TransportEntity::class,
+//        parentColumn = "materialId",
+//        entityColumn = "transportId"
+//    )
+//    val transportEntity: List<TransportEntity>
+//)
+//
+//
+//data class ProjectWithMaterialAndCarbonCountAndTransport (
+//    @Embedded val project: ProjectEntity,
+//    @Relation(
+//        entity = MaterialWithCarbonCountAndTransport::class,
+//        parentColumn = "projectId",
+//        entityColumn = "materialId"
+//    )
+//    val materialWithCarbonCountAndTransport: List<MaterialWithCarbonCountAndTransport>
+//)
