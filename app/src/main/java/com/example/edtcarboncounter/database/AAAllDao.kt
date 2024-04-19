@@ -21,6 +21,9 @@ interface AAAllDao {
     @Query("SELECT materialName FROM MaterialEntity")
     fun getAllMaterialNames(): Flow<List<String>> //Flow<List<MaterialEntity>>
 
+    @Query("SELECT materialId FROM MaterialEntity WHERE value = :value")
+    fun getMaterialId(value): Int //Flow<List<MaterialEntity>>
+
     ///////////////////////////////////////////////////////////////////////
 
     @Upsert
@@ -46,7 +49,8 @@ interface AAAllDao {
     fun getProjectsOrderedByProjectName(): Flow<List<ProjectEntity>>
 
     @Query("SELECT projectName FROM ProjectEntity")
-    fun getAllProjectNames(): Flow<List<String>> //Flow<List<ProjectEntity>>
+    fun getAllProjectNames(): Flow<List<String>> //List<String> //Flow<List<ProjectEntity>>
+
 
     ////////////////////////////////////////////////////////////////////////////////
 //    @Upsert

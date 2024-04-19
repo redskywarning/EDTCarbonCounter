@@ -21,6 +21,11 @@ class ADatabaseViewModel4(private val repository: AADatabaseRepository) : ViewMo
     val allMaterials: LiveData<List<MaterialEntity>> = repository.allMaterials.asLiveData()
     val allTransport: LiveData<List<TransportEntity>> = repository.allTransport.asLiveData()
     val allProjects: LiveData<List<ProjectEntity>> = repository.allProjects.asLiveData()
+    val allProjectNames: LiveData<List<String>> = repository.allProjectNames.asLiveData()
+    val allMaterialNames: LiveData<List<String>> = repository.allMaterialNames.asLiveData()
+    val allTransportNames: LiveData<List<String>> = repository.allTransportNames.asLiveData()
+
+
     val allProjectMaterialTransport: LiveData<List<ProjectWithMaterialAndTransport>> = repository.allProjectMaterialTransport.asLiveData()
 
 
@@ -36,6 +41,12 @@ class ADatabaseViewModel4(private val repository: AADatabaseRepository) : ViewMo
     fun upsertProject(project: ProjectEntity) = viewModelScope.launch {
         repository.upsertProject(project)
     }
+//    fun getAllProjectNames() = viewModelScope.launch {
+//        repository.getAllProjectNames()
+//    }
+
+//    val projectNames: LiveData<List<String>> = repository.getAllProjectNames()
+
     fun upsertProjectMaterialTransport(project_material_transport: ProjectMaterialTransport) = viewModelScope.launch {
         repository.upsertProjectMaterialTransport(project_material_transport)
     }

@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,17 +45,59 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.window.PopupProperties
+import androidx.lifecycle.Observer
 import androidx.navigation.NavHostController
+import com.example.edhellotcarboncounter.screens.BottomBar
+import com.example.edhellotcarboncounter.screens.topBar
 import com.example.edtcarboncounter.data.project
-
-
-
+import com.example.edtcarboncounter.database.ADatabaseViewModel4
 
 
 @Composable
-fun CarbonComparison(navController: NavHostController) {
+fun CarbonComparison(navController: NavHostController, viewModel: ADatabaseViewModel4) {
     var selectedMaterial1 by remember { mutableStateOf("") }
     var selectedMaterial2 by remember { mutableStateOf("") }
+
+    var materialList by remember { mutableStateOf<List<String>>(kotlin.collections.emptyList()) }
+
+    // Observe the LiveData and update projectList when data changes
+    val observer = remember {
+        Observer<List<String>> { newList ->
+            materialList = newList
+        }
+    }
+
+    // Subscribe to the LiveData in the first composition
+    DisposableEffect(Unit) {
+        val liveData = viewModel.allMaterialNames
+        liveData.observeForever(observer)
+
+        // Unsubscribe when the composable is disposed
+        onDispose {
+            liveData.removeObserver(observer)
+        }
+    }
+
+    var transportList by remember { mutableStateOf<List<String>>(kotlin.collections.emptyList()) }
+
+    // Observe the LiveData and update projectList when data changes
+    val observer2 = remember {
+        Observer<List<String>> { newList ->
+            transportList = newList
+        }
+    }
+
+    // Subscribe to the LiveData in the first composition
+    DisposableEffect(Unit) {
+        val liveData = viewModel.allTransportNames
+        liveData.observeForever(observer2)
+
+        // Unsubscribe when the composable is disposed
+        onDispose {
+            liveData.removeObserver(observer2)
+        }
+    }
+
 
     Scaffold(
         topBar = { topBar(navController = navController) },
@@ -65,7 +108,7 @@ fun CarbonComparison(navController: NavHostController) {
                 Icon(Icons.Default.ArrowForward, contentDescription = "Add")
             }
             if (nextPage) {
-                Validation(navController = navController)
+                Validation(navController = navController, materialList = materialList, transportList = transportList)
             }
         }
     ) {

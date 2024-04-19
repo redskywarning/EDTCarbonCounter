@@ -15,6 +15,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.edhellotcarboncounter.screens.BottomBar
+import com.example.edhellotcarboncounter.screens.topBar
 import com.example.edtcarboncounter.NavRoutes
 
 

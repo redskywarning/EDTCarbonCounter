@@ -1,5 +1,7 @@
 package com.example.edtcarboncounter.screens
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -9,6 +11,7 @@ import androidx.compose.material.*
 import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.materialIcon
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material.icons.outlined.Search
@@ -32,9 +35,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.PopupProperties
+import androidx.lifecycle.Observer
+import com.example.edhellotcarboncounter.screens.BottomBar
+import com.example.edhellotcarboncounter.screens.topBar
 import com.example.edtcarboncounter.data.materialObject
+import com.example.edtcarboncounter.data.newMaterialObject
 import com.example.edtcarboncounter.data.project
+import com.example.edtcarboncounter.data.projectObject
 import com.example.edtcarboncounter.data.transportObject
+import com.example.edtcarboncounter.database.ADatabaseViewModel4
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import java.util.Collections.emptyList
@@ -43,10 +52,54 @@ import java.util.Collections.emptyList
 
 val mMaterials = listOf("Steel", "Aluminium", "Concrete", "Iron" )
 val mTransport = listOf("Car", "Lorry", "Boat", "Plane ", "Train")
+var delList = mutableListOf<Int>()
+
 
 //Main Function
 @Composable
-fun CounterMaterial(navController: NavHostController) {
+fun CounterMaterial(navController: NavHostController, viewModel: ADatabaseViewModel4) {
+    var materialList by remember { mutableStateOf<List<String>>(kotlin.collections.emptyList()) }
+
+    // Observe the LiveData and update projectList when data changes
+    val observer = remember {
+        Observer<List<String>> { newList ->
+            materialList = newList
+        }
+    }
+
+    // Subscribe to the LiveData in the first composition
+    DisposableEffect(Unit) {
+        val liveData = viewModel.allMaterialNames
+        liveData.observeForever(observer)
+
+        // Unsubscribe when the composable is disposed
+        onDispose {
+            liveData.removeObserver(observer)
+        }
+    }
+
+    var transportList by remember { mutableStateOf<List<String>>(kotlin.collections.emptyList()) }
+
+    // Observe the LiveData and update projectList when data changes
+    val observer2 = remember {
+        Observer<List<String>> { newList ->
+            transportList = newList
+        }
+    }
+
+    // Subscribe to the LiveData in the first composition
+    DisposableEffect(Unit) {
+        val liveData = viewModel.allTransportNames
+        liveData.observeForever(observer2)
+
+        // Unsubscribe when the composable is disposed
+        onDispose {
+            liveData.removeObserver(observer2)
+        }
+    }
+
+
+
     // Sets up layout of Page
     Scaffold(topBar = {topBar(navController =navController) },
         bottomBar = {BottomBar(navController=navController)},
@@ -57,7 +110,7 @@ fun CounterMaterial(navController: NavHostController) {
                 Icon(Icons.Default.ArrowForward, contentDescription = "Forwards")
             }
             if(nextPage) {
-                Validation(navController = navController)
+                Validation(navController = navController, materialList = materialList, transportList = transportList)
                 nextPage = false
             }
         }
@@ -67,23 +120,31 @@ fun CounterMaterial(navController: NavHostController) {
             Text(
                 "Materials", fontSize = 40.sp, modifier = Modifier.padding(top = 20.dp).align(Alignment.CenterHorizontally)
             )
+            Text(
+                "Make sure all materials you need are already added to database", fontSize = 24.sp, modifier = Modifier.padding(top = 20.dp).align(Alignment.CenterHorizontally)
+            )
             // Allows more materials to be added
             var materialNum by remember {mutableStateOf(0)}
             var materialAddYes by remember { mutableStateOf(0)}
             Button(onClick = {materialAddYes += 1; materialNum += 1}, modifier = Modifier.padding(horizontal = 10.dp),colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff2EC4B6))) {
                 Text(text = "Add Material")
             }
+
+
             // Creates starter material card on screen + allows it to be deleted
             Surface() {
                 var showCard by remember {mutableStateOf( true)}
                 if(showCard) {
-                    materialCards(onDeleteClicked = { showCard = false }, materialNum = 0)
+                    materialCards(onDeleteClicked = { showCard = false }, materialNum = 0, navController = navController, materialList = materialList, transportList = transportList)
+                    //0 if not deleted, 1 if deleted
+                    delList.add(0,0)
                 }
                 else {
                     Card () {
 
                     }
                     project.materials[0].deleted = 1
+                    delList[0] = 1
 
                 }
             }
@@ -91,12 +152,14 @@ fun CounterMaterial(navController: NavHostController) {
             for (material in 1..materialAddYes) {
                 var showCard1 by remember {mutableStateOf( true)}
                 if(showCard1) {
-                    materialCards(onDeleteClicked = { showCard1 = false }, materialNum = material)
+                    materialCards(onDeleteClicked = { showCard1 = false }, materialNum = material, navController = navController, materialList = materialList, transportList = transportList)
+                    delList.add(material,0)
                 }
                 else {
                     Card () {
                     }
                     project.materials[material].deleted = 1
+                    delList[material] = 1
                 }
             }
             Spacer(modifier = Modifier.padding(20.dp))
@@ -106,7 +169,7 @@ fun CounterMaterial(navController: NavHostController) {
 
 // Function for Material Content
 @Composable
-fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                                                                                                                                                                                                                                                                                                              {
+fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int, navController: NavHostController, materialList: List<String>, transportList: List<String>)                                                                                                                                                                                                                                                                                                              {
 
     Card(
         modifier = Modifier
@@ -114,7 +177,7 @@ fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                
             .padding(all = 20.dp)
             .border(border = BorderStroke(1.dp, Color.Black)),
 
-    ) {
+        ) {
         Column {
             Row() {
                 IconButton(onClick = onDeleteClicked) {
@@ -123,7 +186,8 @@ fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                
                 Text("Material:", textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
 
             }
-            project.materials += materialObject(material = "",Smkg = "", Lmkg = 0, transports = mutableListOf<transportObject>(),recyclable = 0, deleted = 0)
+            project.materials += materialObject(material = "",Smkg = "", Lmkg = 0.0, transports = mutableListOf<transportObject>(), recyclable = 0, deleted = 0, transportsDelList = mutableListOf<Int>())
+
             //Main Material Content - Dropdown menu
             Row() {
                 //MaterialDropdownMenuBox()
@@ -161,6 +225,7 @@ fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                
                         }
                     )
 
+
                     DropdownMenu(
                         expanded = mExpanded,
                         onDismissRequest = { mExpanded = false },
@@ -168,7 +233,7 @@ fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                
                         modifier = Modifier
                             .width(with(LocalDensity.current){mTextFieldSize.width.toDp()})
                     ) {
-                        for (Material in mMaterials) {
+                        for (Material in materialList) {
                             if (mSelectedText.uppercase() in Material.uppercase()) {
                                 noMaterialFound = 1
                                 DropdownMenuItem(onClick = {
@@ -185,6 +250,8 @@ fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                
                             //Add in option to add to database
                             DropdownMenuItem(onClick = {
                                 //Call function to create pop up to add to database
+                                navController.navigate(NavRoutes.AddMaterial.route)
+
                             }) {
                                 Text(text = "Add to Database")
                             }
@@ -207,7 +274,7 @@ fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                
                         .padding(horizontal = 10.dp),
                     label = {Text("Material Mass / kg")}
                 )
-                //project.materials += materialObject(material = mSelectedText,Smkg = cmaterialWeight, Lmkg = 0, transports = mutableListOf<transportObject>(),recyclable = 0, deleted = 0)
+                //project.materials += materialObject(material = mSelectedText,Smkg = cmaterialWeight, Lmkg = 0.0, transports = mutableListOf<transportObject>(),recyclable = 0, deleted = 0)
             }
             //Transport Content
             var transportAddYes by remember { mutableStateOf(-1)}
@@ -215,16 +282,19 @@ fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                
                 Text(text = "Add transport")
             }
 
-            for (transport in 0..transportAddYes) {
+            for (transportNum in 0..transportAddYes) {
                 var showCardt by remember {mutableStateOf( true)}
                 if(showCardt) {
-                    TransportAdd(onDeleteClicked = { showCardt = false }, materialNum = materialNum, transportNum = transport)
+                    TransportAdd(onDeleteClicked = { showCardt = false }, materialNum = materialNum, transportNum = transportNum, navController = navController, transportList = transportList)
+                    project.materials[materialNum].transportsDelList.add(transportNum,0)
                 }
                 else {
                     Card () {
 
                     }
-                    project.materials[materialNum].transports[transport].deleted = 1
+                    project.materials[materialNum].transports[transportNum].deleted = 1
+                    project.materials[materialNum].transportsDelList[transportNum] = 1
+
                     //transportAddYes -= 1
                 }
             }
@@ -234,8 +304,8 @@ fun materialCards(onDeleteClicked: () -> Unit, materialNum: Int)                
 }
 
 @Composable
-fun TransportAdd(onDeleteClicked: () -> Unit, materialNum: Int, transportNum: Int) {
-    // Transport Cotent
+fun TransportAdd(onDeleteClicked: () -> Unit, materialNum: Int, transportNum: Int, navController: NavHostController, transportList: List<String>) {
+    // Transport Content
     Card () {
 
         Spacer(modifier = Modifier.padding(2.5.dp))
@@ -243,7 +313,7 @@ fun TransportAdd(onDeleteClicked: () -> Unit, materialNum: Int, transportNum: In
             var mExpanded by remember { mutableStateOf(false) }
             var noTransportFound: Int = 0
             var transportSelected: Int = 0
-            project.materials[materialNum].transports += transportObject(type = "", Sdistance = "", Ldistance = 0, deleted = 0)
+            project.materials[materialNum].transports += transportObject(type = "", Sdistance = "", Ldistance = 0.0, deleted = 0)
 
             var tSelectedText by remember { mutableStateOf("") }
             var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
@@ -287,7 +357,7 @@ fun TransportAdd(onDeleteClicked: () -> Unit, materialNum: Int, transportNum: In
                     modifier = Modifier
                         .width(with(LocalDensity.current){mTextFieldSize.width.toDp()})
                 ) {
-                    for (Transport in mTransport) {
+                    for (Transport in transportList) {
                         if (tSelectedText.uppercase() in Transport.uppercase()) {
                             noTransportFound = 1
                             DropdownMenuItem(onClick = {
@@ -304,6 +374,7 @@ fun TransportAdd(onDeleteClicked: () -> Unit, materialNum: Int, transportNum: In
                         //Add in option to add to database
                         DropdownMenuItem(onClick = {
                             //Call function to create pop up to add to database
+                            navController.navigate(NavRoutes.AddTransport.route)
                         }) {
                             Text(text = "Add to Transport Database")
                         }
@@ -336,25 +407,31 @@ fun TransportAdd(onDeleteClicked: () -> Unit, materialNum: Int, transportNum: In
 }
 // Validation before page moves on to ensure content entered is all correct
 @Composable
-fun Validation(navController: NavHostController) {
+fun Validation(navController: NavHostController, materialList: List<String>, transportList: List<String>) {
+    Log.d(TAG, "Object contents: " + project.materials.toString());
+
+
     var allValid = true
-    for (material in project.materials) {
-        if (material.deleted ==1) {
-            project.materials.remove(material)
-            return
-        }
-        if (material.material == "") {
-            allValid = false
-            val context = LocalContext.current
-            Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
-        }
-        if (material.Smkg == "") {
-            allValid = false
-            val context = LocalContext.current
-            Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
-        }
-        //var context = LocalContext.current
-        //Toast.makeText(context, ":" +material.material, Toast.LENGTH_SHORT).show()
+//    var tempProject = projectObject(projectName = "", materials = mutableListOf(), recyclableMats = project.recyclableMats)
+//    for (material in project.materials) {
+//        if(material.deleted == 0){
+//            tempProject.materials.add()
+//        }
+//    }
+    for (i in delList) {
+        if (i == 0) {
+            if (project.materials[i].material == "") {
+                allValid = false
+                val context = LocalContext.current
+                Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show() //TO DO
+            }
+            if (project.materials[i].Smkg == "") {
+                allValid = false
+                val context = LocalContext.current
+                Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show() //TO DO
+            }
+            //var context = LocalContext.current
+            //Toast.makeText(context, ":" +material.material, Toast.LENGTH_SHORT).show()
 //        var matInList = material.material in mMaterials
 //        var matNum = 1
 //        if (matInList) {
@@ -363,68 +440,172 @@ fun Validation(navController: NavHostController) {
 //        context = LocalContext.current
 //        Toast.makeText(context, matNum, Toast.LENGTH_SHORT).show()
 
-        //Text("a" + material.material, textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
-        //Text(material.Smkg, textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
-        var matIn = 0
-        for ( i in mMaterials) {
-            if (material.material == i) {
-                matIn = 1
-            }
-        }
-        if(matIn == 0){
-            allValid = false
-            val context = LocalContext.current
-            Toast.makeText(context, "Please select a material in the database", Toast.LENGTH_SHORT).show()
-            //return
-        }
-        if(material.Smkg.toLongOrNull() == null) {
-            allValid = false
-            val context = LocalContext.current
-            Toast.makeText(context, "Material Weights must be numbers", Toast.LENGTH_SHORT).show()
-            //return
-        }
-        if(material.Smkg.toLongOrNull() != null) {
-            material.Lmkg = material.Smkg.toLong()
-        }
-        for (transport in material.transports) {
-            if (transport.deleted ==1) {
-                material.transports.remove(transport)
-                return
-            }
-            if (transport.type == "") {
-                allValid = false
-                val context = LocalContext.current
-                Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
-            }
-            if (transport.Sdistance == "") {
-                allValid = false
-                val context = LocalContext.current
-                Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
-            }
-            var tranIn = 0
-            for(i in mTransport) {
-                if(transport.type == i) {
-                    tranIn = 1
+            //Text("a" + material.material, textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
+            //Text(material.Smkg, textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
+            var matIn = 0
+            for ( k in materialList) {
+                if (project.materials[i].material == k) {
+                    matIn = 1
+                    break
                 }
             }
-            if(tranIn == 0){
+            if(matIn == 0){
                 allValid = false
                 val context = LocalContext.current
-                Toast.makeText(context, "Please select a transport type in the database", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Please select a material in the database", Toast.LENGTH_SHORT).show() //TO DO
                 //return
             }
-            if(transport.Sdistance.toLongOrNull() == null) {
+            if(project.materials[i].Smkg.toDoubleOrNull() == null) {
                 allValid = false
                 val context = LocalContext.current
-                Toast.makeText(context, "Distances must be numbers", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Material Weights must be numbers", Toast.LENGTH_SHORT).show() //TO DO
                 //return
             }
-            if(transport.Sdistance.toLongOrNull() != null) {
-                transport.Ldistance = transport.Sdistance.toLong()
+            if(project.materials[i].Smkg.toDoubleOrNull() != null) {
+                project.materials[i].Lmkg = project.materials[i].Smkg.toDouble()
             }
+            for (k in project.materials[i].transportsDelList) {
+                if (k == 0) {
+                    if (project.materials[i].transports[k].type == "") {
+                        allValid = false
+                        val context = LocalContext.current
+                        Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                    }
+                    if (project.materials[i].transports[k].Sdistance == "") {
+                        allValid = false
+                        val context = LocalContext.current
+                        Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                    }
+                    var tranIn = 0
+                    for(l in transportList) {
+                        if(project.materials[i].transports[k].type == l) {
+                            tranIn = 1
+                            break
+                        }
+                    }
+                    if(tranIn == 0){
+                        allValid = false
+                        val context = LocalContext.current
+                        Toast.makeText(context, "Please select a transport type in the database", Toast.LENGTH_SHORT).show()
+                        //return
+                    }
+                    if(project.materials[i].transports[k].Sdistance.toDoubleOrNull() == null) {
+                        allValid = false
+                        val context = LocalContext.current
+                        Toast.makeText(context, "Distances must be numbers", Toast.LENGTH_SHORT).show() //TO DO
+                        //return
+                    }
+                    if(project.materials[i].transports[k].Sdistance.toDoubleOrNull() != null) {
+                        project.materials[i].transports[k].Ldistance = project.materials[i].transports[k].Sdistance.toDouble()
+                    }
+                }
+            }
+
+
+
         }
     }
+
+//    for (material in project.materials) {
+//        if (material.deleted ==1) {
+//            return
+//        }
+//        val context = LocalContext.current
+//
+//        Toast.makeText(context,material.material, Toast.LENGTH_SHORT).show()
+//
+//
+//        if (material.material == "") {
+//            allValid = false
+//            val context = LocalContext.current
+//            Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show() //TO DO
+//        }
+//        if (material.Smkg == "") {
+//            allValid = false
+//            val context = LocalContext.current
+//            Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show() //TO DO
+//        }
+//        //var context = LocalContext.current
+//        //Toast.makeText(context, ":" +material.material, Toast.LENGTH_SHORT).show()
+////        var matInList = material.material in mMaterials
+////        var matNum = 1
+////        if (matInList) {
+////            matNum = 0
+////        }
+////        context = LocalContext.current
+////        Toast.makeText(context, matNum, Toast.LENGTH_SHORT).show()
+//
+//        //Text("a" + material.material, textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
+//        //Text(material.Smkg, textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
+//        var matIn = 0
+//        for ( i in mMaterials) {
+//            if (material.material == i) {
+//                matIn = 1
+//            }
+//        }
+//        if(matIn == 0){
+//            allValid = false
+//            val context = LocalContext.current
+//            Toast.makeText(context, "Please select a material in the database", Toast.LENGTH_SHORT).show() //TO DO
+//            //return
+//        }
+//        if(material.Smkg.toDoubleOrNull() == null) {
+//            allValid = false
+//            val context = LocalContext.current
+//            Toast.makeText(context, "Material Weights must be numbers", Toast.LENGTH_SHORT).show() //TO DO
+//            //return
+//        }
+//        if(material.Smkg.toDoubleOrNull() != null) {
+//            material.Lmkg = material.Smkg.toDouble()
+//        }
+//        for (transport in material.transports) {
+//            if (transport.deleted ==1) {
+//                material.transports.remove(transport)
+//                return
+//            }
+//            if (transport.type == "") {
+//                allValid = false
+//                val context = LocalContext.current
+//                Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+//            }
+//            if (transport.Sdistance == "") {
+//                allValid = false
+//                val context = LocalContext.current
+//                Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+//            }
+//            var tranIn = 0
+//            for(i in mTransport) {
+//                if(transport.type == i) {
+//                    tranIn = 1
+//                }
+//            }
+//            if(tranIn == 0){
+//                allValid = false
+//                val context = LocalContext.current
+//                Toast.makeText(context, "Please select a transport type in the database", Toast.LENGTH_SHORT).show()
+//                //return
+//            }
+//            if(transport.Sdistance.toDoubleOrNull() == null) {
+//                allValid = false
+//                val context = LocalContext.current
+//                Toast.makeText(context, "Distances must be numbers", Toast.LENGTH_SHORT).show() //TO DO
+//                //return
+//            }
+//            if(transport.Sdistance.toDoubleOrNull() != null) {
+//                transport.Ldistance = transport.Sdistance.toDouble()
+//            }
+//        }
+//    }
     if (allValid) {
+        //ADD IN TO DATABASE
+        for (material in project.materials) {
+            //material.material
+            //material.Lmkg
+            for (transport in material.transports) {
+                //transport.type
+                //transport.Ldistance
+            }
+        }
         navController.navigate(NavRoutes.CounterRecycled.route)
     }
     else {

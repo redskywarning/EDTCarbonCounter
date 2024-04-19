@@ -15,6 +15,11 @@ import com.example.edtcarboncounter.ui.theme.EDTCarbonCounterTheme
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.edhellotcarboncounter.screens.Home
+import com.example.edtcarboncounter.database.AAAllDao
+import com.example.edtcarboncounter.database.AADatabaseApplication
+import com.example.edtcarboncounter.database.AADatabaseRepository
+import com.example.edtcarboncounter.database.ADatabaseViewModel4
 
 class MainActivity : ComponentActivity() {
     //TEST
@@ -38,6 +43,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
     val navController=rememberNavController()
+    val viewModel = AADatabaseApplication().getViewModel()
 
     NavHost(
         navController = navController,
@@ -53,13 +59,13 @@ fun MainScreen() {
             ReceiptRecall(navController = navController)
         }
         composable(NavRoutes.CounterMaterial.route){
-            CounterMaterial(navController = navController)
+            CounterMaterial(navController = navController, viewModel = viewModel)
         }
         composable(NavRoutes.CounterReceipt.route){
             CounterReceipt(navController = navController)
         }
         composable(NavRoutes.CounterRecycled.route){
-            CounterRecycled(navController = navController)
+            CounterRecycled(navController = navController, viewModel = viewModel)
         }
         composable(NavRoutes.DatabaseAdd.route){
             DatabaseAdd(navController = navController)
@@ -74,10 +80,16 @@ fun MainScreen() {
             DatabaseUpdate(navController = navController)
         }
         composable(NavRoutes.CarbonComparison.route){
-            CarbonComparison(navController = navController)
+            CarbonComparison(navController = navController, viewModel = viewModel)
         }
         composable(NavRoutes.CounterProject.route){
-            CounterProject(navController = navController)
+            CounterProject(navController = navController, viewModel = viewModel)
+        }
+        composable(NavRoutes.AddMaterial.route) {
+            AddMaterial(navController = navController, viewModel = viewModel)
+        }
+        composable(NavRoutes.AddTransport.route) {
+            AddTransport(navController = navController, viewModel = viewModel)
         }
     }
 }

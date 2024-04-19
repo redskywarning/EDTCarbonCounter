@@ -84,7 +84,7 @@ abstract class AADatabase : RoomDatabase() {
                     allDao.upsertTransport(transport)
 
                     //Add transport.
-                    var project = ProjectEntity("Trial 1", 0)
+                    var project = ProjectEntity("Trial 1", 0.0)
                     allDao.upsertProject(project)
 
                     // Add material_transport

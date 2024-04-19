@@ -18,6 +18,7 @@ data class MaterialEntity(
 @Entity
 data class ProjectEntity(
     val projectName: String,
+    val projectTotalCarbon: Double,
     @PrimaryKey(autoGenerate = true)
     val projectId: Int = 0
 )

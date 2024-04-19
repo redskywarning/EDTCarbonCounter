@@ -14,15 +14,57 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Observer
 import androidx.navigation.NavHostController
+import com.example.edhellotcarboncounter.screens.BottomBar
+import com.example.edhellotcarboncounter.screens.topBar
+import com.example.edhellotcarboncounter.screens.BottomBar
+import com.example.edhellotcarboncounter.screens.topBar
 
 import com.example.edtcarboncounter.NavRoutes
 import com.example.edtcarboncounter.data.project
 import com.example.edtcarboncounter.data.projectNamesList
+import com.example.edtcarboncounter.database.AAAllDao
+import com.example.edtcarboncounter.database.AADatabase
+import com.example.edtcarboncounter.database.ADatabaseViewModel4
+import com.example.edtcarboncounter.database.ProjectEntity
 import java.util.logging.Logger.global
+//import kotlin.coroutines.jvm.internal.CompletedContinuation.context
 
 @Composable
-fun CounterProject(navController: NavHostController) {
+fun CounterProject(navController: NavHostController, viewModel: ADatabaseViewModel4) {
+
+//    var projectList = AAAllDao.getAllProjectNames()
+    //val projectDao = viewModel.AAAllDao() // Assuming you have a projectDao instance in your viewModel
+
+//    var projectList by remember { mutableStateOf<List<String>>(emptyList()) }
+//
+//    LaunchedEffect(key1 = Unit) {
+//        val dao = AADatabase.getDatabase(context, scope).allDao() // Get the DAO instance using allDao() method
+//        projectList = dao.getAllProjectNames()
+//    }
+    //var projectList = viewModel.allProjectNames
+
+    var projectList by remember { mutableStateOf<List<String>>(emptyList()) }
+
+    // Observe the LiveData and update projectList when data changes
+    val observer = remember {
+        Observer<List<String>> { newList ->
+            projectList = newList
+        }
+    }
+
+    // Subscribe to the LiveData in the first composition
+    DisposableEffect(Unit) {
+        val liveData = viewModel.allProjectNames
+        liveData.observeForever(observer)
+
+        // Unsubscribe when the composable is disposed
+        onDispose {
+            liveData.removeObserver(observer)
+        }
+    }
+
     Scaffold(topBar = {topBar(navController =navController) },
         bottomBar = {BottomBar(navController=navController)},
     ) {
@@ -60,7 +102,39 @@ fun CounterProject(navController: NavHostController) {
                 }
                 if (buttonYes){
                     buttonYes = false
-                    Validate(navController = navController, projectName = projectName)
+
+                    if (projectName == "") {
+                        val context = LocalContext.current
+                        Toast.makeText(context, "Please Enter a Project Name", Toast.LENGTH_SHORT).show()
+                    }
+                    //To Check no repeats of project name
+                    else if (projectName in projectList) {
+//                    else if (projectList.contains(projectName)) {
+                        val context = LocalContext.current
+                        Toast.makeText(context, "Project Name already Exists", Toast.LENGTH_SHORT).show()
+                    }
+                    else {
+                        project.projectName = projectName
+                        projectNamesList += projectName
+                        viewModel.upsertProject(ProjectEntity(projectName,0.0))
+                        navController.navigate(NavRoutes.CounterMaterial.route)
+                    }
+
+//                    else {
+//                        viewModel.getAllProjectNames() { projectList ->
+//                            if (projectName in projectList) {
+//                                val context = LocalContext.current
+//                                Toast.makeText(context, "Project Name already Exists", Toast.LENGTH_SHORT).show()
+//                            }
+//                            else {
+//                                viewModel.upsertProject(ProjectEntity(projectName,0.0))
+//                                navController.navigate(NavRoutes.CounterMaterial.route)
+//                            }
+//                        }
+//
+//                    }
+//                    viewModel.upsertProject(..);
+//                    Validate(navController = navController, projectName = projectName)
                 }
             }
         }
@@ -68,20 +142,20 @@ fun CounterProject(navController: NavHostController) {
 }
 
 // Ensures project name is entered and is unique to prevent errors
-@Composable
-fun Validate(navController: NavHostController, projectName: String) {
-    if (projectName == "") {
-        val context = LocalContext.current
-        Toast.makeText(context, "Please Enter a Project Name", Toast.LENGTH_SHORT).show()
-    }
-    //To Check no repeats of project name
-    else if (projectName in projectNamesList) {
-        val context = LocalContext.current
-        Toast.makeText(context, "Project Name already Exists", Toast.LENGTH_SHORT).show()
-    }
-    else {
-        project.projectName = projectName
-        projectNamesList += projectName
-        navController.navigate(NavRoutes.CounterMaterial.route)
-    }
-}
+//@Composable
+//fun Validate(navController: NavHostController, projectName: String) {
+//    if (projectName == "") {
+//        val context = LocalContext.current
+//        Toast.makeText(context, "Please Enter a Project Name", Toast.LENGTH_SHORT).show()
+//    }
+//    //To Check no repeats of project name
+//    else if (projectName in projectNamesList) {
+//        val context = LocalContext.current
+//        Toast.makeText(context, "Project Name already Exists", Toast.LENGTH_SHORT).show()
+//    }
+//    else {
+//        project.projectName = projectName
+//        projectNamesList += projectName
+//        navController.navigate(NavRoutes.CounterMaterial.route)
+//    }
+//}

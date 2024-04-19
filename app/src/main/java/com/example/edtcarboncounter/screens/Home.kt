@@ -1,4 +1,4 @@
-package com.example.edtcarboncounter.screens
+package com.example.edhellotcarboncounter.screens
 
 import android.content.res.Resources
 import androidx.compose.foundation.*

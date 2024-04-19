@@ -13,4 +13,6 @@ sealed class NavRoutes(val route: String){
     object DatabaseUpdate: NavRoutes("DatabaseUpdate")
     object CarbonComparison: NavRoutes("CarbonComparison")
     object CounterProject: NavRoutes("CounterProject")
+    object AddMaterial: NavRoutes("AddMaterial")
+    object AddTransport: NavRoutes("AddTransport")
 }
