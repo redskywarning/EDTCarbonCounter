@@ -54,10 +54,31 @@ class AADatabaseRepository(private val AAAllDao: AAAllDao) {
     suspend fun deleteProject(project: ProjectEntity) {
         AAAllDao.deleteProject(project)
     }
-    suspend fun upsertProjectMaterialTransport(project_material_transport: ProjectMaterialTransport) {
-        AAAllDao.upsertProjectMaterialTransport(project_material_transport)
+    suspend fun insertProjectMaterialTransport(project_material_transport: ProjectMaterialTransport) {
+        AAAllDao.insertProjectMaterialTransport(project_material_transport)
     }
     suspend fun deleteProjectMaterialTransport(project_material: ProjectMaterialTransport) {
         AAAllDao.deleteProjectMaterialTransport(project_material)
+    }
+    suspend fun getMaterialIdFromMaterialName(materialName: String): Long {
+        return AAAllDao.getMaterialIdFromMaterialName(materialName)
+    }
+    suspend fun getMaterialNameFromMaterialId(materialId: Long): String {
+        return AAAllDao.getMaterialNameFromMaterialId(materialId)
+    }
+    suspend fun getTransportIdFromTransportName(transportName: String): Long {
+        return AAAllDao.getTransportIdFromTransportName(transportName)
+    }
+    suspend fun getTransportNameFromTransportId(transportId: Long): String {
+        return AAAllDao.getTransportNameFromTransportId(transportId)
+    }
+    suspend fun getProjectIdFromProjectName(projectName: String): Long {
+        return AAAllDao.getProjectIdFromProjectName(projectName)
+    }
+    suspend fun getProjectNameFromProjectId(projectId: Long): String {
+        return AAAllDao.getProjectNameFromProjectId(projectId)
+    }
+    suspend fun getProjectRowCount(): Long {
+        return AAAllDao.getProjectRowCount()
     }
 }

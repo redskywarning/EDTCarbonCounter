@@ -88,8 +88,8 @@ abstract class AADatabase : RoomDatabase() {
                     allDao.upsertProject(project)
 
                     // Add material_transport
-                    var project_material = ProjectMaterialTransport(0, 0, 0, 900.0, 100.0)
-                    allDao.upsertProjectMaterialTransport(project_material)
+                    //var project_material = ProjectMaterialTransport(0, 0, 0, 900.0, 100.0, 0)
+                    //allDao.upsertProjectMaterialTransport(project_material)
 
                 }
             }

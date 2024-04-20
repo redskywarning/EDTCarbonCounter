@@ -259,18 +259,18 @@ fun rmaterialCards(onDeleteClicked: () -> Unit, materialNum: Int)               
                 Text(text = "Add transport")
             }
             // Same as for material -> allows transport to be deleted
-            for (transport in 0..transportAddYes) {
+            for (transportNum in 0..transportAddYes) {
                 var showCardt by remember {mutableStateOf( true)}
                 if(showCardt) {
-                    project.recyclableMats[materialNum].transportsDelList.add(transport, 0)
-                    rTransportAdd(onDeleteClicked = { showCardt = false }, materialNum = materialNum, transportNum = transport)
+                    project.recyclableMats[materialNum].transportsDelList.add(transportNum, 0)
+                    rTransportAdd(onDeleteClicked = { showCardt = false }, materialNum = materialNum, transportNum = transportNum)
                 }
                 else {
                     Card () {
 
                     }
-                    project.recyclableMats[materialNum].transportsDelList[tranport] = 1
-                    project.recyclableMats[materialNum].transports[transport].deleted = 1
+                    project.recyclableMats[materialNum].transportsDelList[transportNum] = 1
+                    project.recyclableMats[materialNum].transports[transportNum].deleted = 1
                     //transportAddYes -= 1
                 }
             }
@@ -558,6 +558,18 @@ fun rValidation(navController: NavHostController, materialList: List<String>, tr
 //        }
 //    }
     if (allValid) {
+        for (i in rDelList) {
+            if (i == 0) {
+                project.recyclableMats[i].material
+                project.recyclableMats[i].Lmkg
+                for (j in project.recyclableMats[i].transportsDelList) {
+                    if (j == 0) {
+                        project.recyclableMats[i].transports[j].type
+                        project.recyclableMats[i].transports[j].Ldistance
+                    }
+                }
+            }
+        }
         navController.navigate(NavRoutes.CounterReceipt.route)
     }
     else {

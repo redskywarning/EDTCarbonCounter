@@ -36,6 +36,8 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.PopupProperties
 import androidx.lifecycle.Observer
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.edhellotcarboncounter.screens.BottomBar
 import com.example.edhellotcarboncounter.screens.topBar
 import com.example.edtcarboncounter.data.materialObject
@@ -43,9 +45,16 @@ import com.example.edtcarboncounter.data.newMaterialObject
 import com.example.edtcarboncounter.data.project
 import com.example.edtcarboncounter.data.projectObject
 import com.example.edtcarboncounter.data.transportObject
+import com.example.edtcarboncounter.database.AADatabaseApplication
+import com.example.edtcarboncounter.database.AADatabaseApplication.Companion.viewModel
 import com.example.edtcarboncounter.database.ADatabaseViewModel4
+import com.example.edtcarboncounter.database.ProjectEntity
+import com.example.edtcarboncounter.database.ProjectMaterialTransport
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import java.util.Collections.emptyList
 
 //List of Materials/Transport for iteration and selection -> Will be replaced by using data from database
@@ -111,6 +120,129 @@ fun CounterMaterial(navController: NavHostController, viewModel: ADatabaseViewMo
             }
             if(nextPage) {
                 Validation(navController = navController, materialList = materialList, transportList = transportList)
+
+
+//                var allValid = true
+//                for (i in delList) {
+//                    if (i == 0) {
+//                        if (project.materials[i].material == "") {
+//                            allValid = false
+//                            val context = LocalContext.current
+//                            Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show() //TO DO
+//                        }
+//                        if (project.materials[i].Smkg == "") {
+//                            allValid = false
+//                            val context = LocalContext.current
+//                            Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show() //TO DO
+//                        }
+//                        var matIn = 0
+//                        for ( k in materialList) {
+//                            if (project.materials[i].material == k) {
+//                                matIn = 1
+//                                break
+//                            }
+//                        }
+//                        if(matIn == 0){
+//                            allValid = false
+//                            val context = LocalContext.current
+//                            Toast.makeText(context, "Please select a material in the database", Toast.LENGTH_SHORT).show() //TO DO
+//                            //return
+//                        }
+//                        if(project.materials[i].Smkg.toDoubleOrNull() == null) {
+//                            allValid = false
+//                            val context = LocalContext.current
+//                            Toast.makeText(context, "Material Weights must be numbers", Toast.LENGTH_SHORT).show() //TO DO
+//                            //return
+//                        }
+//                        if(project.materials[i].Smkg.toDoubleOrNull() != null) {
+//                            project.materials[i].Lmkg = project.materials[i].Smkg.toDouble()
+//                        }
+//                        for (k in project.materials[i].transportsDelList) {
+//                            if (k == 0) {
+//                                if (project.materials[i].transports[k].type == "") {
+//                                    allValid = false
+//                                    val context = LocalContext.current
+//                                    Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+//                                }
+//                                if (project.materials[i].transports[k].Sdistance == "") {
+//                                    allValid = false
+//                                    val context = LocalContext.current
+//                                    Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+//                                }
+//                                var tranIn = 0
+//                                for(l in transportList) {
+//                                    if(project.materials[i].transports[k].type == l) {
+//                                        tranIn = 1
+//                                        break
+//                                    }
+//                                }
+//                                if(tranIn == 0){
+//                                    allValid = false
+//                                    val context = LocalContext.current
+//                                    Toast.makeText(context, "Please select a transport type in the database", Toast.LENGTH_SHORT).show()
+//                                    //return
+//                                }
+//                                if(project.materials[i].transports[k].Sdistance.toDoubleOrNull() == null) {
+//                                    allValid = false
+//                                    val context = LocalContext.current
+//                                    Toast.makeText(context, "Distances must be numbers", Toast.LENGTH_SHORT).show() //TO DO
+//                                    //return
+//                                }
+//                                if(project.materials[i].transports[k].Sdistance.toDoubleOrNull() != null) {
+//                                    project.materials[i].transports[k].Ldistance = project.materials[i].transports[k].Sdistance.toDouble()
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//                if (allValid) {
+//                    val context = LocalContext.current
+//                    Toast.makeText(context, "xxxx", Toast.LENGTH_SHORT).show()
+//                    //ADD IN TO DATABASE
+//                    for (i in delList) {
+//                        if (i == 0) {
+//                            var cur_material_name = project.materials[i].material
+//                            var cur_material_mass = project.materials[i].Lmkg
+//                            val cur_material_id = viewModel.getMaterialIdFromMaterialName(cur_material_name)
+//                            val cur_project_id = viewModel.getProjectRowCount()
+//
+//                            var cur_transport_name = ""
+//                            var cur_transport_distance = 0.0
+//                            var c = -1
+//                            for (j in project.materials[i].transportsDelList) {
+//                                if (j == 0) {
+//                                    val context = LocalContext.current
+//                                    Toast.makeText(context, "xxx", Toast.LENGTH_SHORT).show()
+//                                    c +=1
+//                                    var cur_transport_name = project.materials[i].transports[j].type
+//                                    var cur_transport_distance  = project.materials[i].transports[j].Ldistance
+//
+//                                    val cur_transport_id = viewModel.getTransportIdFromTransportName(cur_transport_name)
+//
+//                                    if (c > 0) {
+//                                        val context = LocalContext.current
+//                                        Toast.makeText(context, "x", Toast.LENGTH_SHORT).show()
+//                                        viewModel.upsertProjectMaterialTransport(ProjectMaterialTransport(cur_project_id,cur_material_id, cur_transport_id, cur_material_mass, cur_transport_distance, 1))
+//                                    }
+//                                    else{
+//                                        val context = LocalContext.current
+//                                        Toast.makeText(context, "x", Toast.LENGTH_SHORT).show()
+//                                        viewModel.upsertProjectMaterialTransport(ProjectMaterialTransport(cur_project_id,cur_material_id, cur_transport_id, cur_material_mass, cur_transport_distance, 0))
+//                                    }
+//                                }
+//                                else{
+//                                    val context = LocalContext.current
+//                                    Toast.makeText(context, "xxx", Toast.LENGTH_SHORT).show()
+//                                    viewModel.upsertProjectMaterialTransport(ProjectMaterialTransport(cur_project_id,cur_material_id, -1, cur_material_mass, cur_transport_distance, 0))
+//
+//                                }
+//                            }
+//                        }
+//                    }
+//
+//                    navController.navigate(NavRoutes.CounterRecycled.route)
+//                }
+                //return
                 nextPage = false
             }
         }
@@ -405,43 +537,25 @@ fun TransportAdd(onDeleteClicked: () -> Unit, materialNum: Int, transportNum: In
         Spacer(modifier = Modifier.padding(2.5.dp))
     }
 }
-// Validation before page moves on to ensure content entered is all correct
+
 @Composable
 fun Validation(navController: NavHostController, materialList: List<String>, transportList: List<String>) {
-    Log.d(TAG, "Object contents: " + project.materials.toString());
 
+    val viewModel = AADatabaseApplication().getViewModel()
 
     var allValid = true
-//    var tempProject = projectObject(projectName = "", materials = mutableListOf(), recyclableMats = project.recyclableMats)
-//    for (material in project.materials) {
-//        if(material.deleted == 0){
-//            tempProject.materials.add()
-//        }
-//    }
     for (i in delList) {
         if (i == 0) {
             if (project.materials[i].material == "") {
                 allValid = false
                 val context = LocalContext.current
-                Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show() //TO DO
+                Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
             }
             if (project.materials[i].Smkg == "") {
                 allValid = false
                 val context = LocalContext.current
-                Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show() //TO DO
+                Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
             }
-            //var context = LocalContext.current
-            //Toast.makeText(context, ":" +material.material, Toast.LENGTH_SHORT).show()
-//        var matInList = material.material in mMaterials
-//        var matNum = 1
-//        if (matInList) {
-//            matNum = 0
-//        }
-//        context = LocalContext.current
-//        Toast.makeText(context, matNum, Toast.LENGTH_SHORT).show()
-
-            //Text("a" + material.material, textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
-            //Text(material.Smkg, textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
             var matIn = 0
             for ( k in materialList) {
                 if (project.materials[i].material == k) {
@@ -500,33 +614,87 @@ fun Validation(navController: NavHostController, materialList: List<String>, tra
                     }
                 }
             }
-
-
-
         }
     }
+    val context = LocalContext.current
+    Toast.makeText(context, allValid.toString(), Toast.LENGTH_SHORT).show()
+    if (allValid) {
+        val context = LocalContext.current
+        Toast.makeText(context, "xxxx", Toast.LENGTH_SHORT).show()
+        //ADD IN TO DATABASE
+        for (i in delList) {
+            val context = LocalContext.current
+            Toast.makeText(context, "xxxxx", Toast.LENGTH_SHORT).show()
+            if (i == 0) {
+                var cur_material_name = project.materials[i].material
+                var cur_material_mass = project.materials[i].Lmkg
+                val cur_material_id = viewModel.getMaterialIdFromMaterialName(cur_material_name)
+                val cur_project_id = viewModel.getProjectRowCount()
 
-//    for (material in project.materials) {
-//        if (material.deleted ==1) {
-//            return
-//        }
-//        val context = LocalContext.current
+                var cur_transport_name = ""
+                var cur_transport_distance = 0.0
+                var c = -1
+                for (j in project.materials[i].transportsDelList) {
+                    if (j == 0) {
+                        val context = LocalContext.current
+                        Toast.makeText(context, "xxx", Toast.LENGTH_SHORT).show()
+                        c +=1
+                        var cur_transport_name = project.materials[i].transports[j].type
+                        var cur_transport_distance  = project.materials[i].transports[j].Ldistance
+
+                        val cur_transport_id = viewModel.getTransportIdFromTransportName(cur_transport_name)
+
+                        if (c > 0) {
+                            val context = LocalContext.current
+                            Toast.makeText(context, "x", Toast.LENGTH_SHORT).show()
+                            viewModel.insertProjectMaterialTransport(ProjectMaterialTransport(cur_project_id,cur_material_id, cur_transport_id, cur_material_mass, cur_transport_distance, 1))
+                        }
+                        else{
+                            val context = LocalContext.current
+                            Toast.makeText(context, "x", Toast.LENGTH_SHORT).show()
+                            viewModel.insertProjectMaterialTransport(ProjectMaterialTransport(cur_project_id,cur_material_id, cur_transport_id, cur_material_mass, cur_transport_distance, 0))
+                        }
+                    }
+                    else{
+                        val context = LocalContext.current
+                        Toast.makeText(context, "xxx", Toast.LENGTH_SHORT).show()
+                        viewModel.insertProjectMaterialTransport(ProjectMaterialTransport(cur_project_id,cur_material_id, -1, cur_material_mass, cur_transport_distance, 0))
+
+                    }
+                }
+            }
+        }
+
+        navController.navigate(NavRoutes.CounterRecycled.route)
+    }
+}
+
+
+// Validation before page moves on to ensure content entered is all correct
+//@Composable
+//fun Validation(navController: NavHostController, materialList: List<String>, transportList: List<String>) {
 //
-//        Toast.makeText(context,material.material, Toast.LENGTH_SHORT).show()
-//
-//
-//        if (material.material == "") {
-//            allValid = false
-//            val context = LocalContext.current
-//            Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show() //TO DO
-//        }
-//        if (material.Smkg == "") {
-//            allValid = false
-//            val context = LocalContext.current
-//            Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show() //TO DO
-//        }
-//        //var context = LocalContext.current
-//        //Toast.makeText(context, ":" +material.material, Toast.LENGTH_SHORT).show()
+//    var allValid = true
+////    var tempProject = projectObject(projectName = "", materials = mutableListOf(), recyclableMats = project.recyclableMats)
+////    for (material in project.materials) {
+////        if(material.deleted == 0){
+////            tempProject.materials.add()
+////        }
+////    }
+//    for (i in delList) {
+//        if (i == 0) {
+//            if (project.materials[i].material == "") {
+//                allValid = false
+//                val context = LocalContext.current
+//                Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show() //TO DO
+//            }
+//            if (project.materials[i].Smkg == "") {
+//                allValid = false
+//                val context = LocalContext.current
+//                Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show() //TO DO
+//            }
+//            //var context = LocalContext.current
+//            //Toast.makeText(context, ":" +material.material, Toast.LENGTH_SHORT).show()
 ////        var matInList = material.material in mMaterials
 ////        var matNum = 1
 ////        if (matInList) {
@@ -535,84 +703,184 @@ fun Validation(navController: NavHostController, materialList: List<String>, tra
 ////        context = LocalContext.current
 ////        Toast.makeText(context, matNum, Toast.LENGTH_SHORT).show()
 //
-//        //Text("a" + material.material, textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
-//        //Text(material.Smkg, textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
-//        var matIn = 0
-//        for ( i in mMaterials) {
-//            if (material.material == i) {
-//                matIn = 1
-//            }
-//        }
-//        if(matIn == 0){
-//            allValid = false
-//            val context = LocalContext.current
-//            Toast.makeText(context, "Please select a material in the database", Toast.LENGTH_SHORT).show() //TO DO
-//            //return
-//        }
-//        if(material.Smkg.toDoubleOrNull() == null) {
-//            allValid = false
-//            val context = LocalContext.current
-//            Toast.makeText(context, "Material Weights must be numbers", Toast.LENGTH_SHORT).show() //TO DO
-//            //return
-//        }
-//        if(material.Smkg.toDoubleOrNull() != null) {
-//            material.Lmkg = material.Smkg.toDouble()
-//        }
-//        for (transport in material.transports) {
-//            if (transport.deleted ==1) {
-//                material.transports.remove(transport)
-//                return
-//            }
-//            if (transport.type == "") {
-//                allValid = false
-//                val context = LocalContext.current
-//                Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
-//            }
-//            if (transport.Sdistance == "") {
-//                allValid = false
-//                val context = LocalContext.current
-//                Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
-//            }
-//            var tranIn = 0
-//            for(i in mTransport) {
-//                if(transport.type == i) {
-//                    tranIn = 1
+//            //Text("a" + material.material, textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
+//            //Text(material.Smkg, textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
+//            var matIn = 0
+//            for ( k in materialList) {
+//                if (project.materials[i].material == k) {
+//                    matIn = 1
+//                    break
 //                }
 //            }
-//            if(tranIn == 0){
+//            if(matIn == 0){
 //                allValid = false
 //                val context = LocalContext.current
-//                Toast.makeText(context, "Please select a transport type in the database", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(context, "Please select a material in the database", Toast.LENGTH_SHORT).show() //TO DO
 //                //return
 //            }
-//            if(transport.Sdistance.toDoubleOrNull() == null) {
+//            if(project.materials[i].Smkg.toDoubleOrNull() == null) {
 //                allValid = false
 //                val context = LocalContext.current
-//                Toast.makeText(context, "Distances must be numbers", Toast.LENGTH_SHORT).show() //TO DO
+//                Toast.makeText(context, "Material Weights must be numbers", Toast.LENGTH_SHORT).show() //TO DO
 //                //return
 //            }
-//            if(transport.Sdistance.toDoubleOrNull() != null) {
-//                transport.Ldistance = transport.Sdistance.toDouble()
+//            if(project.materials[i].Smkg.toDoubleOrNull() != null) {
+//                project.materials[i].Lmkg = project.materials[i].Smkg.toDouble()
 //            }
+//            for (k in project.materials[i].transportsDelList) {
+//                if (k == 0) {
+//                    if (project.materials[i].transports[k].type == "") {
+//                        allValid = false
+//                        val context = LocalContext.current
+//                        Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+//                    }
+//                    if (project.materials[i].transports[k].Sdistance == "") {
+//                        allValid = false
+//                        val context = LocalContext.current
+//                        Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+//                    }
+//                    var tranIn = 0
+//                    for(l in transportList) {
+//                        if(project.materials[i].transports[k].type == l) {
+//                            tranIn = 1
+//                            break
+//                        }
+//                    }
+//                    if(tranIn == 0){
+//                        allValid = false
+//                        val context = LocalContext.current
+//                        Toast.makeText(context, "Please select a transport type in the database", Toast.LENGTH_SHORT).show()
+//                        //return
+//                    }
+//                    if(project.materials[i].transports[k].Sdistance.toDoubleOrNull() == null) {
+//                        allValid = false
+//                        val context = LocalContext.current
+//                        Toast.makeText(context, "Distances must be numbers", Toast.LENGTH_SHORT).show() //TO DO
+//                        //return
+//                    }
+//                    if(project.materials[i].transports[k].Sdistance.toDoubleOrNull() != null) {
+//                        project.materials[i].transports[k].Ldistance = project.materials[i].transports[k].Sdistance.toDouble()
+//                    }
+//                }
+//            }
+//
+//
+//
 //        }
 //    }
-    if (allValid) {
-        //ADD IN TO DATABASE
-        for (material in project.materials) {
-            //material.material
-            //material.Lmkg
-            for (transport in material.transports) {
-                //transport.type
-                //transport.Ldistance
-            }
-        }
-        navController.navigate(NavRoutes.CounterRecycled.route)
-    }
-    else {
-        return
-    }
-    //return
-}
+//
+////    for (material in project.materials) {
+////        if (material.deleted ==1) {
+////            return
+////        }
+////        val context = LocalContext.current
+////
+////        Toast.makeText(context,material.material, Toast.LENGTH_SHORT).show()
+////
+////
+////        if (material.material == "") {
+////            allValid = false
+////            val context = LocalContext.current
+////            Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show() //TO DO
+////        }
+////        if (material.Smkg == "") {
+////            allValid = false
+////            val context = LocalContext.current
+////            Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show() //TO DO
+////        }
+////        //var context = LocalContext.current
+////        //Toast.makeText(context, ":" +material.material, Toast.LENGTH_SHORT).show()
+//////        var matInList = material.material in mMaterials
+//////        var matNum = 1
+//////        if (matInList) {
+//////            matNum = 0
+//////        }
+//////        context = LocalContext.current
+//////        Toast.makeText(context, matNum, Toast.LENGTH_SHORT).show()
+////
+////        //Text("a" + material.material, textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
+////        //Text(material.Smkg, textAlign = TextAlign.Left, fontSize = 15.sp, modifier = Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp))
+////        var matIn = 0
+////        for ( i in mMaterials) {
+////            if (material.material == i) {
+////                matIn = 1
+////            }
+////        }
+////        if(matIn == 0){
+////            allValid = false
+////            val context = LocalContext.current
+////            Toast.makeText(context, "Please select a material in the database", Toast.LENGTH_SHORT).show() //TO DO
+////            //return
+////        }
+////        if(material.Smkg.toDoubleOrNull() == null) {
+////            allValid = false
+////            val context = LocalContext.current
+////            Toast.makeText(context, "Material Weights must be numbers", Toast.LENGTH_SHORT).show() //TO DO
+////            //return
+////        }
+////        if(material.Smkg.toDoubleOrNull() != null) {
+////            material.Lmkg = material.Smkg.toDouble()
+////        }
+////        for (transport in material.transports) {
+////            if (transport.deleted ==1) {
+////                material.transports.remove(transport)
+////                return
+////            }
+////            if (transport.type == "") {
+////                allValid = false
+////                val context = LocalContext.current
+////                Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+////            }
+////            if (transport.Sdistance == "") {
+////                allValid = false
+////                val context = LocalContext.current
+////                Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+////            }
+////            var tranIn = 0
+////            for(i in mTransport) {
+////                if(transport.type == i) {
+////                    tranIn = 1
+////                }
+////            }
+////            if(tranIn == 0){
+////                allValid = false
+////                val context = LocalContext.current
+////                Toast.makeText(context, "Please select a transport type in the database", Toast.LENGTH_SHORT).show()
+////                //return
+////            }
+////            if(transport.Sdistance.toDoubleOrNull() == null) {
+////                allValid = false
+////                val context = LocalContext.current
+////                Toast.makeText(context, "Distances must be numbers", Toast.LENGTH_SHORT).show() //TO DO
+////                //return
+////            }
+////            if(transport.Sdistance.toDoubleOrNull() != null) {
+////                transport.Ldistance = transport.Sdistance.toDouble()
+////            }
+////        }
+////    }
+//    if (allValid) {
+//        //ADD IN TO DATABASE
+//        for (i in delList) {
+//            if (i == 0) {
+//                var cur_material_name = project.materials[i].material
+//                var cur_material_mass = project.materials[i].Lmkg
+//                for (j in project.materials[i].transportsDelList) {
+//                    if (j == 0) {
+//                        var cur_transport_name = project.materials[i].transports[j].type
+//                        var cur_transport_distance  = project.materials[i].transports[j].Ldistance
+//                        //viewModel.upsertProject(MaterialEntity(,0.0))
+//                    }
+//                }
+//            }
+//        }
+//        navController.navigate(NavRoutes.CounterRecycled.route)
+//    }
+//    else {
+//        return
+//    }
+//    //return
+//}
 
 //
 //@Composable

@@ -12,7 +12,7 @@ data class MaterialEntity(
     val materialName: String,
     val carbonContent: Double,
     @PrimaryKey(autoGenerate = true)
-    val materialId: Int = 0
+    val materialId: Long = 0
 )
 
 @Entity
@@ -20,7 +20,7 @@ data class ProjectEntity(
     val projectName: String,
     val projectTotalCarbon: Double,
     @PrimaryKey(autoGenerate = true)
-    val projectId: Int = 0
+    val projectId: Long = 0
 )
 
 @Entity
@@ -28,16 +28,17 @@ data class TransportEntity(
     val transportName: String,
     val carbonKgPerKm: Double,
     @PrimaryKey(autoGenerate = true)
-    val transportId: Int = 0,
+    val transportId: Long = 0,
 )
 
 @Entity(primaryKeys = ["projectId","materialId","transportId"])
 data class ProjectMaterialTransport(
-    val projectId: Int,
-    val materialId: Int,
-    val transportId: Int,
+    val projectId: Long,
+    val materialId: Long,
+    val transportId: Long,
     val kgMaterialUsed: Double,
-    val kmTravelled: Double
+    val kmTravelled: Double,
+    val countedBefore: Int
 )
 
 data class ProjectWithMaterialAndTransport(
