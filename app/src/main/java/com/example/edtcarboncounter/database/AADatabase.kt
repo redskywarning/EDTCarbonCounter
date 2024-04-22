@@ -106,17 +106,6 @@ abstract class AADatabase : RoomDatabase() {
             context: Context,
             scope: CoroutineScope
         ): AADatabase {
-            // if the INSTANCE is not null, then return it,
-            // if it is, then create the database
-            //synchronized(this) {
-//                return INSTANCE ?: Room.databaseBuilder(
-//                    context.applicationContext,
-//                    ADatabase::class.java,
-//                    "project_with_material_and_carbon_count_db"
-//                ).build().also {
-//                    INSTANCE = it
-//                }
-//             }
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,

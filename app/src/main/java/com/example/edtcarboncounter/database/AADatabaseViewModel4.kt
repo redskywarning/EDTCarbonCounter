@@ -32,7 +32,7 @@ class ADatabaseViewModel4(private val repository: AADatabaseRepository) : ViewMo
     val allTransportNames: LiveData<List<String>> = repository.allTransportNames.asLiveData()
 
 
-    val allProjectMaterialTransport: LiveData<List<ProjectWithMaterialAndTransport>> = repository.allProjectMaterialTransport.asLiveData()
+    //val allProjectMaterialTransport: LiveData<List<ProjectWithMaterialAndTransport>> = repository.allProjectMaterialTransport.asLiveData()
 
 
     /**

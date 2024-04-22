@@ -95,7 +95,7 @@ interface AAAllDao {
     @Delete
     suspend fun deleteProjectMaterialTransport(project_material_transport: ProjectMaterialTransport)
 
-    @Transaction
-    @Query("SELECT * FROM ProjectEntity")
-    fun getProjectMaterialTransport(): Flow<List<ProjectWithMaterialAndTransport>>
+//    @Transaction
+//    @Query("SELECT * FROM ProjectEntity")
+//    fun getProjectMaterialTransport(): Flow<List<ProjectWithMaterialAndTransport>>
 }

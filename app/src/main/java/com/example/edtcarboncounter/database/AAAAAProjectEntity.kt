@@ -28,34 +28,37 @@ data class TransportEntity(
     val transportName: String,
     val carbonKgPerKm: Double,
     @PrimaryKey(autoGenerate = true)
-    val transportId: Long = 0,
+    val transportId: Long = 0
 )
 
-@Entity(primaryKeys = ["projectId","materialId","transportId"])
+//@Entity(primaryKeys = ["projectId","materialId","transportId"])
+@Entity
 data class ProjectMaterialTransport(
     val projectId: Long,
     val materialId: Long,
     val transportId: Long,
     val kgMaterialUsed: Double,
     val kmTravelled: Double,
-    val countedBefore: Int
+    val countedBefore: Int,
+    @PrimaryKey(autoGenerate = true)
+    val projectMaterialTransportId: Long = 0
 )
 
-data class ProjectWithMaterialAndTransport(
-    @Embedded val project: ProjectEntity,
-    @Relation(
-        parentColumn = "projectId",
-        entityColumn = "materialId",
-        associateBy = Junction(ProjectMaterialTransport::class)
-    )
-    val material: List<MaterialEntity>,
-    @Relation(
-        parentColumn = "projectId",
-        entityColumn = "transportId",
-        associateBy = Junction(ProjectMaterialTransport::class)
-    )
-    val transport: List<TransportEntity>
-)
+//data class ProjectWithMaterialAndTransport(
+//    @Embedded val project: ProjectEntity,
+//    @Relation(
+//        parentColumn = "projectId",
+//        entityColumn = "materialId",
+//        associateBy = Junction(ProjectMaterialTransport::class)
+//    )
+//    val material: List<MaterialEntity>,
+//    @Relation(
+//        parentColumn = "projectId",
+//        entityColumn = "transportId",
+//        associateBy = Junction(ProjectMaterialTransport::class)
+//    )
+//    val transport: List<TransportEntity>
+//)
 
 //@Entity(primaryKeys = ["materialId","transportId"])
 //data class MaterialTransport(
